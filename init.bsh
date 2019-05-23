@@ -6,6 +6,7 @@
 import net.jalbum.filters.auto.*;
 import se.datadosen.util.*;
 import java.util.Date;
+import java.text.SimpleDateFormat;
 
 // Fixing variables written by v5.3.2 by mistake
 void cleanupProperties(folder) {
@@ -1031,7 +1032,7 @@ void initPage() {
 			
 			// Index page 
 			
-			_title = util.cleanup(util.stripHTML((level == 0)? albumTitle : title));
+			_title = util.cleanup(util.stripHTML((level == 0)? albumTitle : title.replaceAll("_", " ")));
 			
 			_category = Category.folder;
 			
@@ -1059,6 +1060,7 @@ void initPage() {
 					if (util.isEmpty(previousFolderTitle)) {
 						previousFolderTitle = ao.getName();
 					}
+					previousFolderTitle = previousFolderTitle.replaceAll("_", " ");
 					previousFolderThumbPath = "../" + (String)vars.get("thumbPath");
 					if ((ao = util.getLastImage(ao)) != null) {
 						if (util.makeSlides)
@@ -1080,6 +1082,7 @@ void initPage() {
 					if (util.isEmpty(nextFolderTitle)) {
 						nextFolderTitle = ao.getName();
 					}
+					nextFolderTitle = nextFolderTitle.replaceAll("_", " ");
 					nextFolderThumbPath = "../" + (String)vars.get("thumbPath");
 					if ((ao = util.getFirstImage(ao)) != null) {
 						if (util.makeSlides)
@@ -1202,11 +1205,15 @@ void initPage() {
 void getFooterLinks() {	
 	boolean first = true;
 	StringBuilder sb = new StringBuilder(2048);
+
+	sb.append("Last updated on " + (new SimpleDateFormat("MMMM d, yyyy")).format(time));
+	first = false;
 	
 	if (showImageCount != void && showImageCount) {
 		//int i = thumbCount + folderImgCount;
 		//((level == 0)? totalAlbumImages : (thumbCount + folderImgCount));
 		if (totalImageCount > 0) {
+			if (!first) sb.append(sep);
 			sb.append(totalImageCount + " " + util.getText((totalImageCount > 1)? "images" : "image"));
 			first = false;
 		}
@@ -1318,10 +1325,16 @@ void updateImage(boolean allData) {
 	// Link to original or high-res
 	_link = (_category == Category.image && hiResPath != void && hiResPath != null)? 
 		hiResPath : ((originalPath != void && originalPath != null)? originalPath : "");
-		
+
 	// Image has original :: boolean
 	_original = (hiResPath == void || hiResPath == null) && (originalPath != void && originalPath != null);
-	
+
+	// Link to original images
+	if (_category == Category.image && imagePath != void && imagePath != null) {
+		_link = rootPath + "/s3/photos/" + relPath + imagePath.replace("slides/", "");
+		_original = true;
+	}
+
 	// file extension
 	_ext = util.getExt(imagePath);
 	if (util.isEmpty(_ext)) {
