@@ -1,0 +1,34 @@
+<%-- User interface for editing this page from within jAlbum --%>
+<ja:ui>
+	class SitemapUI extends JWebPageUI {
+		JCheckBox showSitemapDescriptions = new JCheckBox("Show descriptions", true);
+		JCheckBox showSitemapThumbs = new JCheckBox("Show thumbnails", false);
+		{
+			showSitemapDescriptions.setOpaque(false);
+			showSitemapThumbs.setOpaque(false);
+			add(showSitemapDescriptions);
+			add("br", showSitemapThumbs);
+			add("br", new JLabel("The sitemap is automatically generated from the current folder and the folders below. Works best in the top level folder."));
+			add("br", new JLabel("The comment added below will be displayed above the folders."));
+			
+			putClientProperty("helpPage", "http://lazaworx.com/static/help/ui/sitemap-page.html");
+		}
+	}
+</ja:ui>
+
+<ja:include page="page-header.inc" /> <%-- Keep this --%>
+
+	<div id="sitemap-page">
+		<aside><img src="${resPath}/compass.png"></aside>
+		<ja:if exists="caption"><div class="caption">${caption}</div></ja:if>
+		<div class="sitemap<ja:if test="${showSitemapThumbs}"> showthumbs</ja:if>">
+			<div class="title">
+				<ja:if test="${showSitemapThumbs}"><a href="${rootPath}/${indexName}" class="home">&nbsp;</a></ja:if>
+				<a href="${rootPath}/${indexName}">${albumTitle}</a>
+				<ja:if test="${showSitemapDescriptions}"><small>${albumDescription}</small></ja:if>
+			</div>
+			<ja:include page="templates/Sitemap.inc" />
+		</div>
+	</div>
+
+<ja:include page="page-footer.inc" /> <%-- Keep this --%>

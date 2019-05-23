@@ -1,0 +1,103 @@
+<%-- User interface for editing this page from within jAlbum --%>
+<ja:ui>
+	class AboutUI extends JWebPageUI {
+		import javax.swing.filechooser.*;
+		
+		JTextField aboutHeader = new JTextField();
+		JTextArea aboutText = new JSmartTextArea(8,30);
+		JTextField authorImage = new JTextField(10);
+		JButton selectImage = new JButton("Select");
+		JFileChooser fc = new JFileChooser();
+		fc.setFileFilter(new FileNameExtensionFilter("Images", new String[] {"jpg", "png", "gif"}));
+		fc.setDialogTitle(texts.getString("ui.selectAuthorImage"));
+		JCheckBox useDummyAuthorImage = new JCheckBox(texts.getString("ui.useDummyAuthorImage"), true);
+		JCheckBox allowJalbumAd = new JCheckBox(texts.getString("ui.allowJalbumAd"));
+		
+		File getFile() {
+			int returnVal = fc.showOpenDialog(window);
+			return (returnVal == JFileChooser.APPROVE_OPTION)? fc.getSelectedFile() : null;
+		}
+		
+		String copyFile(File src) {
+			if ( src.exists() ) {
+				File dst = new File(engine.getDirectory(), "res");
+				String name = src.getName(), n = name.toLowerCase();
+				boolean scale = n.indexOf(".jpg") > 0 || n.indexOf(".png") > 0; 
+				try {
+					if (!dst.exists()) {
+						dst.mkdirs();
+					}
+					dst = new File(dst, name);
+					if (scale) {
+						AlbumImage ai = new AlbumImage(src, engine);
+						ai = ai.scaleToFit(new Dimension(320,320));
+						ai.saveImage(dst);
+					} else
+						IO.copyFile(src, dst);
+					return dst.getName();
+				} catch (IOException e) {
+					System.out.println(e);
+					return null;
+				}
+			}
+			return null;
+		}
+		
+		{
+			selectImage.addActionListener(new ActionListener() { 
+				public void actionPerformed(ActionEvent e) {
+					File src = getFile();
+					if (src != null) {
+						String n = copyFile(src);
+						if (n != null) {
+							authorImage.setText(n);
+							useDummyAuthorImage.setSelected(false);
+						}
+					}
+			}});
+			
+			aboutText.setLineWrap(true);
+			aboutText.setFont(new Font("monospaced", Font.PLAIN, 12));
+			add(new JLabel(texts.getString("ui.authorImage")));
+			add("tab hfill", authorImage);
+			add(selectImage);
+			add("br", new JLabel(" "));
+			add("tab", useDummyAuthorImage);
+			add("br", new JLabel(texts.getString("ui.headline")));
+			add("tab hfill", aboutHeader);
+			/*
+			add("br tab", allowJalbumAd);
+			add("tab", new JLabel("<html><i>" + texts.getString("ui.allowJalbumAdsInfo") + "</i></html>"));
+			add("tab", new JLinkLabel("https://jalbum.net/affiliate/info", texts.getString("ui.moreInfo")));
+			*/
+			add("br", new JLabel(texts.getString("ui.text")));
+			add("tab hfill vfill", new JScrollPane(aboutText));
+			
+			putClientProperty("helpPage", "https://lazaworx.com/static/help/ui/about-page.html");
+		}
+	}
+</ja:ui>
+
+<ja:include page="page-header.inc" /> <%-- Keep this --%>
+
+				<div id="about-page" class="clearfix">
+					<aside><ja:if test="${useDummyAuthorImage}"><img src="${resPath}/author.png"></ja:if>
+					<ja:else><ja:if exists="authorImage"><img src="${resPath}/${authorImage}"></ja:if><ja:else>&nbsp;</ja:else></ja:else></aside>
+					<div class="texts">
+						<ja:if exists="aboutHeader"><h1>${aboutHeader}</h1></ja:if>
+						<ja:if exists="aboutText"><div>${aboutText}</div></ja:if>
+						<ja:if exists="comment"><div>${comment}</div></ja:if>
+					</div>
+				</div>
+				<ja:if test="${allowJalbumAd}">
+				<div id="jalbum-promo" class="clearfix">
+					<ja:if exists="jalbumPromo">${jalbumPromo}</ja:if>
+					<ja:else><aside><img src="${resPath}/jalbum-promo.png"></aside>
+					<div class="texts">$text.promoContent
+						<div class="buttons"><a href="https://jalbum.net/purchase?ref=${userId}">$text.promoButton</a></div>
+					</div>
+					</ja:else>
+				</div>
+				</ja:if>
+
+<ja:include page="page-footer.inc" /> <%-- Keep this --%>

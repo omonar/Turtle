@@ -1,0 +1,3074 @@
+/*
+	common.css - the primary styles
+	
+	Author: Laza
+*/
+
+<ja:include page="cssinit.bsh" />
+
+<ja:include page="includes/html5bp-reset.css" />
+
+html {
+	height: 100%;
+	min-height: 100%;
+}
+body {
+	height: 100%;
+	overflow: auto;
+	font-family: ${fontFamily};
+	font-size: ${fontSize};
+	line-height: 1.385;
+	color: ${textColor};
+	${bgColor}
+	-webkit-overflow-scrolling: touch;
+	overflow-scrolling: touch;
+}
+select, input, textarea {  
+	color: #444;
+}
+input[type=text]::-ms-clear {
+    display: none;
+}
+a, a:active, a:visited {
+	color: ${linkColor};
+	text-decoration: none;
+}
+a:hover {
+	color: ${hoverColor};
+}
+a img {	border: none; text-decoration: none; }
+h1,h2,h3 { font-weight: normal; margin: 0 0 0.2em 0; line-height: 1.2; }
+h4,h5,h6 { font-weight: bold; margin: 0 0 0.5em 0; }
+h1 { font-size: <ja:if exists="headlineSize">${headlineSize}</ja:if><ja:else>240%;</ja:else> }
+h2 { font-size: 200%; }
+h3 { font-size: 140%; }
+h4 { font-size: 115%; }
+h5 { font-size: 100%; }
+h6 { font-size: 90%; }
+
+video, audio { 
+	vertical-align: top; 
+}
+
+.chromeframe { position: relative; z-index: 9999; }
+.chromeframe a { color: #ffffff; }
+.chromeframe a:hover { color: #ff0000; } 
+
+.addtop { 
+	margin-top: 10px; 
+}
+
+.center {
+	text-align: center;
+}
+
+.hook { 
+	position: absolute;
+	display: none;
+}
+
+<ja:if exists="headlineName">
+@font-face {
+	font-family: "${headlineName}";
+	font-style: normal;
+	font-weight: normal;
+	src: local("${headlineName}"), url('https://themes.googleusercontent.com/static/fonts/${headlinePath}') format('woff');
+}
+h1<ja:if test="${folderTitleSameAsHeadline}">,h2,h3,h4</ja:if> { font-family: "${headlineName}", ${fontFamily}; font-weight: normal; }
+</ja:if><ja:else><ja:if exists="headlinePath">
+h1<ja:if test="${folderTitleSameAsHeadline}">,h2,h3,h4</ja:if> { font-family: ${headlinePath}; }
+</ja:if></ja:else>
+
+/******************************************* Tooltip */
+
+.tooltip {
+	display: none;
+	position: absolute;
+	left: 0;
+	top: 0;
+	padding: 6px;
+	color: #000;
+	max-width: 240px;
+	z-index: 99999;
+	background-color: rgba(255,255,255,0.9);
+	${cr_s}
+	${bs_mm}
+}
+.no-rgba .tooltip {
+	background-color: transparent;
+	background-image: url(w80.png);
+}
+.tooltip > .nub {
+	position: absolute;
+	display: block;
+	padding: 0;
+	margin-left: 50%;
+	left: -5px;
+	top: -10px;
+	width: 0;
+	height: 0;
+	border: solid 5px;
+	border-color: transparent transparent rgba(255,255,255,0.9) transparent;
+}
+.tooltip.valign-top > .nub {
+	top: auto;
+	bottom: -10px;
+	border-color: rgba(255,255,255,0.9) transparent transparent transparent;
+}
+.tooltip.valign-middle > .nub {
+	margin-left: 0;
+	top: 50%;
+	margin-top: -5px;
+}
+.tooltip.valign-middle.align-left > .nub {
+	left: auto;
+	border-color: transparent transparent transparent rgba(255,255,255,0.9);
+	right: -10px;
+}
+.tooltip.valign-middle.align-right > .nub {
+	left: -10px;
+	border-color: transparent rgba(255,255,255,0.9) transparent transparent;
+}
+.tooltip a {
+	color: #000;
+}
+.tooltip span.nr {
+	font-size: 80%;
+	line-height: 1.8;
+	vertical-align: top;
+	font-weight: bold;
+	font-style: normal;
+	padding: 1px 3px;
+	color: #ddd;
+	background-color: #222;
+	${cr_s}
+}
+.tooltip #breadcrumb a {
+	display: block;
+	padding: 3px 5px;
+}
+.tooltip #breadcrumb a:hover {
+	background-color: #000;
+	color: #fff;
+}
+.tooltip.regions a {
+	display: block;
+	font-size: 85%;
+	color: #000;
+	padding: 2px 4px;
+	line-height: 1.8;
+}
+.tooltip.regions a:hover {
+	color: #fff;
+	background-color: #000;
+}
+.tooltip small b {
+	background-color: #ddd;
+	padding: 1px 2px;
+	${cr_s}
+}
+.tooltip form {
+	display: inline-block;
+	position: relative;
+	margin: 3px;
+}
+.tooltip form input {
+	background-color: #fff;
+	vertical-align: middle;
+}
+.tooltip.slideshowdelay input,
+.tooltip form input.searchtext {
+	padding: 2px 20px 2px 6px;
+	height: 20px;
+	line-height: 20px;
+	${cr_s}
+	border: 1px solid #bbb;
+	${bis_sm}
+}
+.tooltip.slideshowdelay input {
+	width: 30px;
+}
+.tooltip form input.searchtext {
+	width: 120px;
+}
+.tooltip form a.button {
+	display: block;
+	position: absolute;
+	top: 3px;
+	right: 3px;
+	width: 20px;
+	height: 20px;
+	background-color: #fff;
+	background-image: url(ok.png);
+	background-position: 0 0;
+	background-repeat: no-repeat;	
+	z-index: 99999;
+	cursor: pointer;
+	-moz-border-radius: 0 2px 2px 0;
+	border-radius: 0 2px 2px 0;
+	${bs_sm}
+}
+.tooltip form a.button:hover {
+	background-position: 0 -40px;
+}
+.tooltip p.info {
+	margin: 0;
+	max-width: 160px;
+	color: #666;
+	font-size: 80%;
+	line-height: 1;
+}
+.tooltip input.fullw {
+	margin: 0.2em 0;
+	padding: 0 1%;
+	width: 96%;
+}
+
+.tooltip a.original, 
+.tooltip .sizes a {
+	display: inline-block;
+	vertical-align: top;
+	margin: 0 0 0 0.5em;
+	padding: 2px 4px;
+	font-size: 80%;
+	background-color: rgba(17,119,176,1);
+	color: #ddd;
+	${cr_s}
+} 
+.tooltip .sizes a:first-child {
+	margin-left: 0;
+}
+.tooltip a.original:hover
+.tooltip .sizes a:hover {
+	background-color: rgba(0,102,153,1);
+	color: #fff;
+}	
+
+/******************************************* Modal windows v2 */
+
+._m_window {
+	position: absolute;
+	position: fixed;
+	left: 0;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	overflow: hidden;
+	outline: none;
+	z-index: 99998;
+}
+._m_window.darken {
+	background-color: rgba(0,0,0,0.6);
+}
+.no-rgba ._m_window.darken {
+	background-color: transparent;
+	background-image: url(k60.png);
+}
+._m_panel {
+	position: absolute;
+	overflow: hidden;
+	/*left: -10000px;*/
+	${cr_l}
+	${bs_lm}
+}
+._m_head {
+	position: relative;
+	height: 30px;
+	line-height: 30px;
+	${cr_lt}
+	-moz-background-clip: padding;
+	-webkit-background-clip: padding-box;
+	background-clip: padding-box; 
+	-ms-touch-action: none;
+	touch-action: none;
+}
+._m_head h5 {
+	position: absolute;
+	text-align: center;
+	margin: 0;
+	left: 35px;
+	right: 35px;
+	color: #666;
+	overflow: hidden;
+}
+._m_head span {
+	position: absolute;
+	display: inline-block;
+	left: 0;
+	top: 0;
+	width: 30px;
+	height: 30px;
+	color: #222;
+	text-align: center;
+	font-weight: bold;
+	-moz-border-radius: ${crl}px 0 0 0;
+	border-radius: ${crl}px 0 0 0;
+	border-right: 1px solid rgba(0,0,0,0.2);
+}
+._m_head span.error {
+	background-color: rgba(255,0,0,0.5);
+}
+._m_head span.warning {
+	background-color: rgba(255,242,0,0.5);
+}
+._m_head a.close {
+	position: absolute;
+	display: inline-block;
+	right: 0;
+	top: 0;
+	cursor: default;
+	text-align: center;
+	min-width: 30px;
+	height: 30px;
+	line-height: 30px;
+	-moz-border-radius: 0 ${crl}px 0 0;
+	border-radius: 0 ${crl}px 0 0;
+	background-repeat: no-repeat;
+}
+._m_head span, 
+._m_head a.close {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 14px;
+}
+.no-rgba ._m_head a.close {
+	background-color: transparent;
+}
+._m_head a.close:hover {
+	background-color: rgba(0,0,0,0.2);
+}
+.no-rgba ._m_head a.close:hover {
+	background-color: transparent;
+}
+.no-cssgradients ._m_head a.close {
+	border-radius: 0;
+}
+._m_cont {
+	position: relative;
+	overflow: hidden;
+	padding-bottom: 16px;
+	${cr_lb}
+}
+._m_cont a { color: #39c; }
+._m_cont a:hover { color: #3bf; }
+._m_cont_i {
+	padding: 16px 16px 0 16px;
+	overflow: auto;
+	-webkit-overflow-scrolling: touch;
+	overflow-scrolling: touch;
+	color: #444;	
+}
+._m_panel a.resize {
+	display: inline-block;
+	position: absolute;
+	right: 0;
+	bottom: 0;
+	width: 14px;
+	height: 14px;
+	cursor: nwse-resize;
+	z-index: 99999;
+	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOBAMAAADtZjDiAAAAA3NCSVQICAjb4U/gAAAAElBMVEX////29vYAAAD29vYgICAYGBgbQ3DVAAAABnRSTlMAESJVZoiDrvV+AAAACXBIWXMAAAsSAAALEgHS3X78AAAAFnRFWHRDcmVhdGlvbiBUaW1lADEyLzA0LzEzSpgBewAAABx0RVh0U29mdHdhcmUAQWRvYmUgRmlyZXdvcmtzIENTNui8sowAAAApSURBVAiZY2BABioQiikYQqsaoHFVIFyIgKoBWB4Hl8WABaybEQiRAAAa2QVZvCefFQAAAABJRU5ErkJggg==);
+	-ms-touch-action: none;
+	touch-action: none;
+}
+
+#dialog ._m_cont_i {
+	text-align: center;
+}
+
+.no-touch ._m_window ::-webkit-scrollbar {
+	width: 14px;
+	height: 14px;
+}
+
+<ja:if test="${modalLight}">
+._m_head {
+	border-bottom: 1px solid #bbb;
+	background-color: #d8d8d8;
+	background-image: -moz-linear-gradient(top, #fff 0%,#eee 50%,#e8e8e8 50%,#ccc 100%);
+	background-image: -webkit-linear-gradient(top, #fff 0%,#eee 50%,#e8e8e8 50%,#ccc 100%);
+	background-image: -o-linear-gradient(top, #fff 0%,#eee 50%,#e8e8e8 50%,#ccc 100%);
+	background-image: -ms-linear-gradient(top, #fff 0%,#eee 50%,#e8e8e8 50%,#ccc 100%);
+	background-image: linear-gradient(top, #fff 0%,#eee 50%,#e8e8e8 50%,#ccc 100%);
+	filter: progid: DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#FFFFFF',endColorstr='#CCCCCC');
+}
+._m_head h5,
+._m_head span,
+._m_head a.close {
+	color: #666;
+	${tb_s}
+}
+._m_head a.close {
+	background-color: rgba(0,0,0,0.1);
+	border-left: 1px solid rgba(0,0,0,0.2);
+}
+.no-rgba ._m_head a.close {
+	background-image: url(k10.png);
+	border-left: 1px solid #aaa;
+}
+._m_head a.close:hover {
+	background-color: rgba(0,0,0,0.2);
+}
+.no-rgba ._m_head a.close:hover {
+	background-image: url(k20.png);
+}
+._m_cont {
+	background-color: #f8f8f8;
+	background-color: rgba(244,244,244,0.95);
+	border-top: 1px solid #fff;
+}
+._m_cont a { color: #39c; }
+._m_cont a:hover { color: #3bf; }
+._m_cont_i { color: #444; }
+
+/* Custom scrollbars for webkit */
+.no-touch ._m_window ::-webkit-scrollbar-corner {
+	background-color: rgba(0,0,0,0.05);
+}
+.no-touch ._m_window ::-webkit-scrollbar-thumb {
+	background-color: #fff;
+	border: 1px solid rgba(0,0,0,0.2);
+}
+.no-touch ._m_window ::-webkit-scrollbar-track {
+	background-color: rgba(0,0,0,0.05);
+}
+
+</ja:if><ja:else>
+
+._m_head {
+	border-bottom: 1px solid #000;
+	background-color: #222;
+	background-image: -moz-linear-gradient(top, #444 0%,#282828 50%,#202020 50%,#000 100%);
+	background-image: -webkit-linear-gradient(top, #444 0%,#282828 50%,#202020 50%,#000 100%);
+	background-image: -o-linear-gradient(top, #444 0%,#282828 50%,#202020 50%,#000 100%);
+	background-image: -ms-linear-gradient(top, #444 0%,#282828 50%,#202020 50%,#000 100%);
+	background-image: linear-gradient(top, #444 0%,#282828 50%,#202020 50%,#000 100%);
+	filter: progid: DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#444444',endColorstr='#000000');
+}
+._m_head h5,
+._m_head span,
+._m_head a.close {
+	color: #888;
+	${tb_d}
+}
+._m_head a.close {
+	background-color: rgba(255,255,255,0.1);
+	border-left: 1px solid #000;
+}
+.no-rgba ._m_head a.close {
+	background-image: url(w10.png);
+}
+._m_head a.close:hover {
+	color: #888;
+	background-color: rgba(255,255,255,0.2);
+}
+.no-rgba ._m_head a.close:hover {
+	background-image: url(w20.png);
+}
+._m_cont {
+	background-color: #222;
+	background-color: rgba(34,34,34,0.95);
+	border-top: 1px solid #333;
+}
+._m_cont a { color: #9cf; }
+._m_cont a:hover { color: #adf; }
+._m_cont_i { color: #ccc; }
+
+.no-touch ._m_window ::-webkit-scrollbar-corner {
+	background-color: #111;
+}
+.no-touch ._m_window ::-webkit-scrollbar-thumb {
+	background-color: #555;
+	border: 2px solid #000;
+}
+.no-touch ._m_window ::-webkit-scrollbar-track {
+	background-color: #111;
+}
+
+</ja:else>
+
+/******************************************* Buttons for modal windows */
+
+._m_cont .buttons {
+	display: block;
+	clear: both;
+	margin-top: 10px;
+	text-align: center;
+	line-height: 30px;
+}
+._m_cont .buttons a {
+	padding: 0 10px;
+	margin: 5px 2px;
+	display: inline-block;
+	min-width: 80px;
+	text-align: center;
+	color: #eee;
+	cursor: default;
+	white-space: nowrap;
+	${cr_s}
+	background-color: #555;
+	background-image: -moz-linear-gradient(top, rgba(51,51,51,1), rgba(15,15,15,1) );
+	background-image: -webkit-linear-gradient(top, rgba(51,51,51,1), rgba(15,15,15,1) );
+	background-image: -o-linear-gradient(top, rgba(51,51,51,1), rgba(15,15,15,1) );
+	background-image: -ms-linear-gradient(top, rgba(51,51,51,1), rgba(15,15,15,1) );
+	background-image: linear-gradient(top, rgba(51,51,51,1), rgba(15,15,15,1) );
+	filter: progid: DXImageTransform.Microsoft.Gradient(GradientType=0,startColorstr=#FF333333,EndColorStr=#FF0F0F0F);
+	-ms-filter: "progid: DXImageTransform.Microsoft.Gradient(GradientType=0,startColorstr=#FF333333,EndColorStr=#FF0F0F0F)";
+	-moz-background-clip: padding;
+	-webkit-background-clip: padding-box;
+	background-clip: padding-box;
+	${bs_sm}
+}
+
+._m_cont .buttons a.active,
+._m_cont .buttons a:hover {
+	color: #fff;
+	background-image: -moz-linear-gradient(top, rgba(17,119,176,1), rgba(0,102,153,1) );
+	background-image: -webkit-linear-gradient(top, rgba(17,119,176,1), rgba(0,102,153,1) );
+	background-image: -o-linear-gradient(top, rgba(17,119,176,1), rgba(0,102,153,1) );
+	background-image: -ms-linear-gradient(top, rgba(17,119,176,1), rgba(0,102,153,1) );
+	background-image: linear-gradient(top, rgba(17,119,176,1), rgba(0,102,153,1) );
+	filter: progid: DXImageTransform.Microsoft.Gradient(GradientType=0,startColorstr=#FF1177aa,EndColorStr=#FF006699);
+	-ms-filter: "progid: DXImageTransform.Microsoft.Gradient(GradientType=0,startColorstr=#FF1177aa,EndColorStr=#FF006699)";
+}
+
+/******************************************* Cookie policy */
+
+#cookiepolicy {
+	position: absolute;
+	position: fixed;
+	display: none;
+	left: 0;
+	bottom: 0;
+	width: 100%;
+	padding: 0.5em;
+	background-color: rgba(0,0,0,0.7);
+	font-size: 0.85rem;
+	cursor: pointer;
+	z-index: 999999;
+}
+
+#cookiepolicy p {
+	margin: 0;
+	color: #ccc;
+	text-align: center;
+}
+
+#cookiepolicy p a {
+	margin: 0 0.25em;
+	color: #0f0;
+}
+
+#cookiepolicy p a.btn {
+	color: #fff;
+	background-color: #0c0;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+}
+
+/******************************************* Search results window */
+
+.searchresults > form {
+	position: relative;
+	margin: 0 0 0.5em 0;
+}
+.searchresults > form input {
+	padding: 2px 10% 2px 2%;
+	height: 20px;
+	width: 88%;
+	line-height: 20px;
+	border: none;
+	background-color: #f4f4f4;
+	${cr_m}
+	${bis_sm}
+}
+.searchresults > form a.button {
+	display: block;
+	position: absolute;
+	top: 3px;
+	right: 3px;
+	width: 20px;
+	height: 20px;
+	background-color: #fff;
+	background-image: url(ok.png);
+	background-position: 0 0;
+	background-repeat: no-repeat;	
+	z-index: 99999;
+	cursor: pointer;
+	${cr_s}
+	${bs_sm}
+}
+.searchresults > form a.button:hover {
+	background-position: 0 -20px;
+}
+.searchresults > p:first-child {
+	margin-top: 0;
+}
+.searchresults > a {
+	margin: 4px 0;
+	clear: both;
+	display: block;
+	color: #555;
+	text-align: left;
+	padding: 6px;
+	background-color: #fff;
+	zoom: 1;
+	${cr_m}
+	${bs_mm}
+}
+.searchresults > a.active {
+	background-color: #ddd;
+}
+.searchresults > a: before, 
+.searchresults > a: after { content: "\0020"; display: block; height: 0; visibility: hidden; } 
+.searchresults > a: after { clear: both; }
+.searchresults > a:hover,
+.searchresults > a:focus {
+	padding: 4px;
+	border: 2px solid #999;
+	color: #222;
+}
+.searchresults > a aside {
+	float: left;
+	display: inline-block;
+	width: 20%;
+	min-width: 60px;
+	margin-right: 10px;
+}
+.searchresults > a aside img {
+	max-width: 100%;
+	height: auto;
+}
+.searchresults > a h5,
+.searchresults > a p {
+	margin: 0 0 0.5em 0;
+	overflow: hidden;
+}
+.searchresults > a em {
+	font-style: normal;
+	background-color: #ff9;
+}
+
+/******************************************* Feedback form */
+
+.feedback > form {
+	position: relative;
+	margin: 0 0 0.5em 0;
+}
+.feedback > form p {
+	margin: .5em 0;
+}
+.feedback > form p:first-child {
+	margin-top: 0;
+}
+.feedback > form textarea,
+.feedback > form input {
+	padding: 4px 2%;
+	width: 96%;
+	background-color: #f8f8f8;
+	border: none;
+	${bis_sl}
+	${cr_m}
+}
+.feedback > form input {
+	line-height: 1.5em;
+	height: 1.5em;
+}
+.feedback > form > p textarea {
+	height: 8.5em;
+}
+.feedback > form > div {
+	margin: 4px 0;
+	clear: both;
+	display: block;
+	color: #555;
+	text-align: left;
+	padding: 6px;
+	background-color: #fff;
+	zoom: 1;
+	${cr_m}
+	${bs_mm}
+}
+.feedback > form > div: before, 
+.feedback > form > div: after {  clear: both; content: "\0020"; display: block; height: 0; visibility: hidden; } 
+.feedback > form > div aside {
+	float: left;
+	display: inline-block;
+	margin-right: 10px;
+	width: 30%;           
+	min-width: 60px;
+	max-width: ${thumbWidth}px;
+}
+.feedback > form > div > div {
+	position: relative;
+	overflow: hidden;
+}
+.feedback > form > div aside img {
+	max-width: 100%;
+	height: auto;
+}
+.feedback > form a.remove {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 14px;
+	display: inline-block;
+	position: absolute;
+	width: 20px;
+	height: 20px;
+	line-height: 20px;
+	text-align: center;
+	right: -6px;
+	top: -6px;
+	color: #999;
+	cursor: pointer;
+}
+.feedback > form a.remove:hover {
+	color: #f00;
+}
+.feedback > form label {
+	font-size: 80%;
+	color: #666;
+	display: block;
+	margin-bottom: 0.5em;
+}
+.feedback > form > div textarea {
+	height: 4.5em;
+	background-color: #fff;
+}
+
+/******************************************* Shop multiple items */
+
+.shopall {
+	text-align: center;
+}
+.shopall ul.thumbs {
+	width: auto;
+	margin: 0 0 15px 0;
+	padding: 0;
+	list-style-type: none;
+}
+.shopall ul.thumbs li {
+	position: relative;
+	display: inline-block;
+	margin: 1px;
+	text-align: center;
+	width: ${smallThumbWidth}px;
+	height: ${smallThumbHeight}px;
+	line-height: ${smallThumbHeight}px;
+}
+.shopall ul.thumbs li img {
+	width: auto;
+	height: auto;
+	max-width: ${smallThumbWidth}px;
+	max-height: ${smallThumbHeight}px;
+}
+
+.shopall ul.thumbs li a.remove {
+	display: inline-block;
+	position: absolute;
+	width: 20px;
+	height: 20px;
+	text-align: center;
+	right: 0;
+	top: 0;
+	font-size: 150%;
+	line-height: 1;
+	color: #999;
+	cursor: pointer;
+}
+.shopall ul.thumbs li a.remove:hover {
+	color: #f00;
+}
+
+/******************************************* Help window */
+
+.help {
+	font-size: 12px;
+}
+.help ul { 
+	clear: both;
+	margin: 0;
+	background-repeat: no-repeat;
+	background-position: left 8px;
+	padding: .5em 0 .5em 360px;
+	list-style-type: none;
+}
+.help .index {
+	background-image: url(helpsplash.png);
+	min-height: 160px;
+}
+.help .slide { 
+	background-image: url(helpgallery.png);
+	min-height: 260px;
+}
+.help ul: after { 
+	clear: both;
+}
+.help ul:first-child {
+	margin-top: 0;
+}
+.help ul:last-child {
+	margin-bottom: 0;
+	border-bottom: none;
+}
+.help li {
+	text-align: left;
+	text-indent: -30px;
+	line-height: 2;
+}
+.help li em {
+	padding: 2px 5px;
+	margin-left: 10px;
+	font-style: normal;
+	font-size: 85%;
+	white-space: nowrap;
+	border: 1px solid #999;	
+	${cr_s}
+}
+.help li b {
+	padding: 2px 5px;
+	font-weight: bold;
+	white-space: nowrap;
+	${cr_s}
+}
+.help li span {
+	padding: 2px 5px;
+	margin-right: 10px;
+	font-weight: bold;
+	${cr_s}
+}
+#help ._m_cont p {
+	text-align: center;
+	margin: 0.5em 0 0 0;
+}
+<ja:if test="${modalLight}">
+.help li b {
+	background-color: #fff;
+}
+.help li span {
+	background-color: #333;
+	color: #ddd;
+}
+</ja:if><ja:else>
+.help li b {
+	background-color: #000;
+}
+.help li span {
+	background-color: #ccc;
+	color: #333;
+}
+</ja:else>
+
+/******************************************* Generic controls */
+
+.controls a,
+a.control {
+	background-image: url(controls.png);
+	background-repeat: no-repeat;
+	background-position: 0 0;
+}
+
+.controls a:hover,
+a.control:hover {
+	background-position: -70px inherit;
+}
+
+/******************************************* Main layout elements */
+
+#widgetbg {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	height: ${bottom}px;
+	z-index: 1;
+}
+#mainbg {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: ${bottom}px;
+	z-index: 0;
+}
+#main {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: ${bottom}px;
+	overflow: auto;
+	z-index: 10;
+	-webkit-text-size-adjust: 120%;
+	zoom: 1;
+}
+
+#main header {
+	position: relative;
+}
+
+#main .items {
+	-ms-overflow-style: -ms-autohiding-scrollbar;
+	-webkit-overflow-scrolling: touch;
+	overflow-scrolling: touch;
+}
+
+<ja:if test="${splashVertical}"> <%--/* Vertically split layout */--%>
+
+#main header .title aside {
+	clear: left;
+	float: left;
+	margin: 20px 20px 10px 0;
+	width: 40px;
+}
+#main header .title .controls:first-child {
+	${cr_mt}
+}
+#main header .title .controls:last-child {
+	${cr_mb}
+}
+.starttxt {
+	font-size: 120%;
+	-webkit-text-size-adjust: 100%;
+}
+.top-nav {
+	margin-left: ${thumbGap}px;;
+	width: ${galleryWidth}px;
+	z-index: 8888;
+}
+#navigation {
+	text-align: center;
+	background-color: rgba(0,0,0,0.7);
+	padding: 0 10px;
+	z-index: 998;
+	${cr_lb}
+	${bs_md}
+}
+
+<ja:if test="${smartScroll}"> <%--/* Smart Scrolling */--%>
+#main .container {
+	position: relative;
+	width: ${containerWidth}px;
+	height: 100%;
+	max-height: 100%;
+	zoom: 1;
+	margin: 0 auto;
+}
+#main .left {
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: ${folderImageWidth}px;
+	bottom: 0;
+}
+#main .right {
+	position: absolute;
+	left: ${itemsLeft}px;
+	width: ${itemsFullWidth}px;
+	top: 0;
+	bottom: 0;
+}
+#main .items {
+	position: absolute;
+	left: 0;
+	top: ${itemsTop}px;
+	right: 0;
+	bottom: 0;
+	overflow: hidden;
+	touch-action: none;
+	-ms-touch-action: none;
+	-ms-touch-select: none;
+}
+</ja:if><ja:else> <%--/* Browser scrolling */--%>
+#main .container {
+	position: relative;
+	width: ${containerWidth}px;
+	zoom: 1;
+	margin: 0 auto;
+}
+#main .left {
+	float: left;
+	display: inline;
+	width: ${folderImageWidth}px;
+	margin-right: ${verticalGap}px;
+}
+#main .right {
+	width: ${tableWidth}px;
+	overflow: hidden;
+}
+#main .items {
+	width: ${itemsFullWidth}px;
+	position: relative;
+	margin: ${gutter}px 0 0 0;
+}
+</ja:else>
+
+</ja:if><ja:else> <%--/* Header above layout */--%>
+
+#main .container {
+	position: relative;
+	width: ${containerWidth}px;
+	height: 100%;
+	max-height: 100%;
+	zoom: 1;
+	margin: 0 auto;
+}
+#main header {
+	margin-left: ${thumbGap}px;
+}
+#main header .title aside {
+	float: right;
+	margin-top: 20px;
+}
+#main header .title .controls:first-child {
+	${cr_ml}
+}
+#main header .title .controls:last-child {
+	${cr_mr}
+}
+#main header .description {
+	clear: both;
+}
+.starttxt {
+	font-size: 140%;
+}
+#main .items {
+	width: ${itemsFullWidth}px;
+	margin: 0;
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+#navigation {
+	text-align: center;
+	background-color: rgba(0,0,0,0.7);
+	border-bottom: 1px solid rgba(0,0,0,0.4);
+	-moz-box-shadow: 0 1px 1px rgba(0,0,0,0.4);
+	-webkit-box-shadow: 0 1px 1px rgba(0,0,0,0.4);
+	box-shadow: 0 1px 1px rgba(0,0,0,0.4);
+	z-index: 998;
+}
+
+<ja:if test="${smartScroll}"> <%--/* Smart scrolling */--%>
+#main header {
+	margin-left: ${scrollBarWidth}px;
+}
+#main .items {
+	position: absolute;
+	left: ${itemsLeft}px;
+	top: ${itemsTop}px;
+	bottom: 0;
+	min-height: ${itemsMinHeight}px;
+	-ms-touch-action: none;
+	-ms-touch-select: none;
+	touch-action: none;
+}
+.page #main .items {
+	top: ${itemsTopPage}px;
+}
+.sub-album #main .items {
+	top: ${itemsTopSubAlbum}px;
+}
+</ja:if><ja:else> <%--/* Browser scrolling */--%> 
+#main .items {
+	margin-top: ${gutter}px;
+}
+</ja:else>
+
+</ja:else> <%--/* Horizontal / Vertical */--%>
+
+<ja:if test="${smartScroll}">
+/******************************************* Scroller controls */
+
+.scrup,
+.scrdn {
+	position: absolute;
+	right: 0;
+	width: 20px;
+	height: 20px;
+	line-height: 20px;
+	background-repeat: no-repeat;
+	background-image: url(pg.png);
+}
+.scrup {
+	top: 0;
+	z-index: 990;
+	background-position: 0 -20px;
+}
+.scrdn {
+	bottom: 0;
+	z-index: 991;
+	background-position: 0 -40px;
+}
+.scrup:hover {
+	background-position: -20px -20px;
+}
+.scrdn:hover {
+	background-position: -20px -40px;
+}
+.scrbar {
+	position: absolute;
+	right: 3px;
+	width: 14px;
+	top: 20px;
+	bottom: 20px;
+	-moz-border-radius: 7px;
+	border-radius: 7px;
+	background-color: rgba(255,255,255,0.3);
+	${bis_sm}
+}
+.no-rgba .scrbar {
+	background-color: transparent;
+	background-image: url(w40.png);
+}
+.scrbar div {
+	position: absolute;
+	top: 2px;
+	left: 2px;
+	right: 2px;
+	height: 5px;
+	-moz-border-radius: 7px;
+	border-radius: 7px;
+	${bgColor}
+	${bs_sm}
+}
+.scrbar div img {
+	width: 100%;
+	height: 100%;
+}
+</ja:if>
+
+/******************************************* Header */
+
+#main header {
+	width: ${folderImageWidth}px;
+	height: ${folderImageHeight}px;
+	max-height: 100%;
+	z-index: 10;
+<ja:if test="${headerType}" value="themeImage">
+	background-position: center center;
+	background-repeat: no-repeat;
+	background-color: rgba(0,0,0,0.2);
+	background-size: 100% auto;
+</ja:if><ja:else>
+	${hdColor}
+</ja:else>
+<ja:if test="${lightStyle}">
+	${bs_mm}
+</ja:if><ja:else>
+	${bs_md}
+</ja:else>
+	${cr_lb}
+}
+#main header.same {
+	<ja:if test="${themeImageSame}">background-image: url(../${folderImageFileName});</ja:if>
+}
+.ie7 #main header {
+	max-height: none;
+}
+.page #main header {
+	height: ${folderImageHeightPage}px;
+}
+.sub-album #main header {
+	height: ${folderImageHeightSubAlbum}px;
+}
+#main header > .pattern {
+	position: relative;
+	height: 100%;
+<ja:if exists="themeImagePattern">
+	background-image: url('mask.png');
+</ja:if>
+	${cr_lb}
+}
+#main header .title {
+	padding: 0 20px;
+	max-height: ${headerHeight}px;
+	overflow: hidden;
+	color: #fff;
+<ja:if test="${headerType}" value="themeImage">
+	background-color: transparent;
+	background-image: -webkit-linear-gradient(top, rgba(0,0,0,0.6), rgba(0,0,0,0));
+	background-image: -moz-linear-gradient(top, rgba(0,0,0,0.6), rgba(0,0,0,0));
+	background-image: -ms-linear-gradient(top, rgba(0,0,0,0.6), rgba(0,0,0,0));
+	background-image: linear-gradient(top, rgba(0,0,0,0.6), rgba(0,0,0,0));
+	filter: progid: DXImageTransform.Microsoft.Gradient(startColorstr='#99000000',endColorstr='#00000000');
+</ja:if>
+}
+.page #main header .title {
+	max-height: ${headerHeightPage}px;
+}
+.sub-album #main header .title {
+	max-height: ${headerHeightSubAlbum}px;
+}
+#main header .title .upbtn {
+	float: left;
+	margin: 20px 20px 0 0;
+}
+#main header .title .controls {
+	display: inline-block;
+	width: 40px;
+	height: 40px;
+	line-height: 40px;
+	background-color: rgba(0,0,0,0.6);
+}
+.no-rgba #main header .title .controls {
+	background-color: transparent;
+	background-image: url(k60.png);
+}
+#main header .title .controls a {
+	display: block;
+}
+#main header .title .controls:hover {
+	background-color: rgba(0,0,0,0.8);
+}
+.no-rgba #main header .title .controls:hover {
+	background-color: transparent;
+	background-image: url(k80.png);
+}
+#main header .share a {
+	background-position: -735px -15px;
+}
+#main header .download a {
+	background-position: -835px -15px;
+}
+#main header .new a {
+	background-position: -885px -15px;
+}
+#main header .search a {
+	background-position: -685px -15px;
+}
+#main header .about a {
+	background-position: -935px -15px;
+}
+#main header .parent a {
+	background-position: -5px -15px;
+}
+#main header .share a:hover {
+	background-position: -735px -85px;
+}
+#main header .download a:hover {
+	background-position: -835px -85px;
+}
+#main header .new a:hover {
+	background-position: -885px -85px;
+}
+#main header .search a:hover {
+	background-position: -685px -85px;
+}
+#main header .about a:hover {
+	background-position: -935px -85px;
+}
+#main header .parent a:hover {
+	background-position: -5px -85px;
+}
+
+/* Page title and description */
+#main header .hgroup {
+	margin-top: 10px;
+	padding: 10px 0;
+	<ja:if test=<%= showStartSlideshow && !splashVertical%>>margin-right: 110px;</ja:if>
+	overflow-x: hidden;
+<ja:if test="${descriptionVisible}">
+	max-height: ${descriptionHeight}px;
+<ja:if test="${longComments}" value="scroll">
+	overflow-y: auto;
+	-webkit-overflow-scrolling: touch;
+	overflow-scrolling: touch;
+</ja:if><ja:else>
+	overflow: hidden;
+</ja:else>
+}
+.page #main header .hgroup {
+	max-height: ${descriptionHeightPage}px;
+}
+.sub-album #main header .hgroup {
+	max-height: ${descriptionHeightSubAlbum}px;
+</ja:if>
+}
+#main header h1 {
+	font-weight: normal;
+	line-height: 1.1;
+    text-overflow: ellipsis;
+	${ts_md}
+}
+#main header .description {
+	display: inline-block;
+	font-weight: normal;
+	padding: 3px 5px;
+	${ts_md}
+	${cr_s}
+}
+.no-rgba #main header .description {
+	background-color: transparent;
+	background-image: url(k20.png);
+}
+<ja:if not test="${descriptionVisible}">
+#main header .description {
+	position: absolute;
+	max-width: ${descriptionWidth}px;
+	background-color: rgba(0,0,0,0.2);
+	opacity: 0;
+	max-height: ${descriptionHeight}px;
+<ja:if test="${longComments}" value="scroll">
+	overflow-x: hidden;
+	overflow-y: auto;
+</ja:if><ja:else>
+	overflow: hidden;
+</ja:else>
+	z-index: 900;
+	-webkit-overflow-scrolling: touch;
+	overflow-scrolling: touch;
+	transition: opacity 500ms ease;
+	-webkit-transition: opacity 500ms ease;
+	-moz-transition: opacity 500ms ease;
+	-ms-transition: opacity 500ms ease;
+}
+.no-rgba #main header .description {
+	background-color: transparent;
+	background-image: url(k20.png);
+}
+#main header .hgroup:hover .description {
+	opacity: 1;
+}
+.page #main header .hgroup .description {
+	max-height: ${descriptionHeightPage}px;
+}
+.sub-album #main header .hgroup .description {
+	max-height: ${descriptionHeightSubAlbum}px;
+}
+</ja:if><ja:else>
+#main header .description {
+	background-color: transparent;
+	transition: background-color 500ms linear;
+	-webkit-transition: background-color 500ms linear;
+	-moz-transition: background-color 500ms linear;
+	-ms-transition: background-color 500ms linear;
+}
+#main header .description:hover {
+	background-color: rgba(0,0,0,0.2);
+}
+.no-rgba #main header .description:hover {
+	background-color: transparent;
+	background-image: url(k20.png);
+}
+</ja:else>
+#main header .description a {
+	text-decoration: underline;
+	color: #fff;
+}
+#main header .description a:hover {
+	color: #adf;
+}
+/* Breadcrumb path */
+#main header .breadcrumb {
+	font-size: 90%;
+	display: block;
+	margin: 0.2em 0 0.4em 0;
+}
+#main header .breadcrumb div {
+	display: inline-block;
+	overflow: hidden;
+	${cr_m}
+	background-color: rgba(0,0,0,0.2);
+	${bis_ml}
+}
+.no-rgba #main header .breadcrumb div {
+	background-color: transparent;
+	background-image: url(k20.png);
+} 
+#main header .breadcrumb a {
+	display: inline-block;
+	font-weight: bold;
+	padding: 0 0.5em;
+	line-height: 2em;
+	height: 2em;
+	color: #ddd;
+	${ts_sd}
+}
+#main header .breadcrumb a:hover,
+#main header .breadcrumb a:focus {
+	color: #fff;
+	background-color: rgba(0,0,0,0.5);
+}
+#main header .breadcrumb a:first-child {
+	${cr_ml}
+}
+#main header .breadcrumb a:last-child {
+	${cr_mr}
+}
+
+/*********************************** Start slideshow */
+
+.startshow {
+	position: absolute;
+	overflow: hidden;
+	bottom: 20px;
+	right: 20px;
+	width: 90px;
+	height: 90px;
+	${cr_m}
+	background-color: rgba(0,0,0,0.2);
+	cursor: pointer;
+	-webkit-transition: background-color 500ms linear;
+	-moz-transition: background-color 500ms linear;
+	-ms-transition: background-color 500ms linear;
+	transition: background-color 500ms linear;
+}
+.no-rgba .startshow {
+	background-color: transparent;
+	background-image: url(k20.png);
+}
+.startshow:hover {
+	background-color: rgba(0,0,0,0.8);
+}
+.no-rgba .startshow:hover {
+	background-color: transparent;
+	background-image: url(k80.png);
+}
+.starttxt {
+	float: right;
+	height: 90px;
+	padding: 0 90px 0 20px;
+	line-height: 90px;
+	color: #fff;
+	overflow: hidden;
+	text-align: right;
+    text-overflow: ellipsis;
+	white-space: nowrap;
+	background-image: url(start.png);
+	background-repeat: no-repeat;
+	background-position: right 0;
+}
+.startshow:hover .starttxt {
+	background-position: right -90px;
+}
+
+/*********************************** Left box = map and FB commenting */
+
+<ja:if test="${splashVertical}">
+<ja:if test="${smartScroll}">
+.left-box {
+	position: absolute;
+	left: 0;
+	top: ${leftBoxTop}px;
+	width: ${leftBoxWidth}px;
+	padding-right: ${scrollBarWidth}px;
+	bottom: 0;
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+#page .left-box {
+	top: ${leftBoxTopPage}px;	
+}
+#index.sub-album .left-box {
+	top: ${leftBoxTopSubAlbum}px;	
+}
+.left-box .cont {
+	position: absolute;
+}
+</ja:if><ja:else>
+.left-box {
+	margin-top: ${gutter}px;
+	width: ${commentsWidth}px;
+	padding-right: ${scrollBarWidth}px;
+	overflow-x: hidden;
+	overflow-y: auto;
+	-webkit-overflow-scrolling: touch;
+	overflow-scrolling: touch;
+}
+</ja:else>
+</ja:if><ja:else>
+.left-box {
+	margin-top: ${gutter}px;
+	margin-left: ${thumbGap}px;
+	min-height: 120px;
+}
+</ja:else>
+
+/*********************************** Items */
+
+#main .items > .cont {
+	display: block;
+	width: ${tableWidth}px;
+	padding-right: ${scrollBarWidth}px;
+}
+
+/*********************************** Footer */
+
+#main footer {
+	clear: both;
+	display: block;
+	margin: 10px ${thumbGap}px;
+	text-align: center;
+}
+#main footer .wrap {
+	padding: 0.5em 1em;
+	${cr_m}
+}
+#main footer .wrap img {
+	max-width: 100%;
+}
+#main footer .promotion,
+#main footer .footer-links {
+	font-size: 75%;
+}
+#main .footer em {
+	font-style: italic;
+}
+
+/*********************************** Top navigation */
+
+.no-rgba #navigation {
+	background-color: transparent;
+	background-image: url(k80.png);
+}
+<ja:if exists="logo">
+#navigation .logo {
+	float: left;
+	display: inline-block;
+	max-width: 25%;
+	line-height: 37px;
+	margin-right: 2%;
+	vertical-align: top;
+}
+#navigation .logo a {
+	display: block;
+}
+#navigation .logo img {
+	max-height: 100px;
+	vertical-align: middle;
+}
+#navigation nav {
+	padding-left: 30%;
+	padding-right: 10px;
+}
+</ja:if><ja:else>
+#navigation nav {
+	text-align: center;
+}
+</ja:else>
+#navigation nav > ul {
+}
+#navigation nav ul {
+	display: inline-block;
+	padding: 0;
+	margin: 0;
+	list-style-type: none;
+}
+#navigation nav li {
+	transition: background-color 500ms linear;
+	-webkit-transition: background-color 500ms linear;
+	-moz-transition: background-color 500ms linear;
+	-ms-transition: background-color 500ms linear;
+	-o-transition: background-color 500ms linear;
+}
+#navigation nav ul a {
+	display: block;
+	line-height: 30px;
+    text-overflow: ellipsis;
+	white-space: nowrap;
+	color: #ccc;
+	transition: color 300ms linear;
+	-webkit-transition: color 300ms linear;
+	-moz-transition: color 300ms linear;
+	-ms-transition: color 300ms linear;
+	-o-transition: color 300ms linear;
+	${ts_sd}
+}
+#navigation nav > ul > li > a {
+	max-width: 180px;
+	overflow: hidden;
+	line-height: ${navLineHeight}px;
+}
+#navigation nav > ul > li {
+	position: relative;
+	display: inline-block;
+	vertical-align: top;
+	width: auto;
+	height: ${navLineHeight}px;
+}
+.ie7 #navigation nav > ul > li {
+	float: left;
+}
+#navigation nav > ul > li.home {
+	width: 40px;
+	height: ${navLineHeight}px;
+}
+#navigation nav > ul > li.home a {
+	display: block;
+	line-height: ${navLineHeight}px;
+	background-position: -785px -19px;
+}
+#navigation nav > ul > li.home a:hover {
+	background-position: -785px -89px;
+}
+#navigation nav li.actual {
+	background-color: #000;
+}
+#navigation nav li:hover {
+	background-color: rgba(0,0,0,0.8);
+}
+.no-rgba #navigation nav li:hover {
+	background-color: transparent;
+	background-image: url(k90.png);
+}
+#navigation nav li:hover > a {
+	color: #fff;
+}
+#navigation nav > ul > li > a {
+	/*font-size: 110%;*/
+	padding: 0 .75em;
+}
+#navigation nav > ul > li ul {
+	display: none;
+	position: absolute;
+	line-height: 30px;
+	text-align: left;
+	z-index: 999;
+	background-color: rgba(0,0,0,0.8);
+	${bs_md}
+}
+.no-rgba #navigation nav > ul > li ul {
+	background-color: transparent;
+	background-image: url(k80.png);
+}
+#navigation nav > ul > li > ul {
+	min-width: 100%;
+}
+#navigation nav > ul > li > ul li {
+	position: relative;
+	display: block;
+}
+#navigation nav > ul > li > ul > li a {
+	line-height: 30px;
+	font-size: 100%;
+	padding: 0 8px;
+}
+#navigation nav > ul > li > ul > li ul {
+	position: absolute;
+	left: 100%;
+	top: 0;
+}
+#navigation nav > ul > li:hover > ul,
+#navigation nav > ul > li > ul > li:hover > ul,
+#navigation nav > ul > li > ul > li > ul > li:hover > ul {
+	display: block;
+}
+
+/******************************************* Pages */
+
+#main article {
+	display: block;
+	position: relative;
+	margin: 0 ${thumbGap}px;
+	padding: 20px;
+	color: ${textColor};
+	background-color: rgba(255,255,255,0.1);
+	${cr_l}
+	${bs_mm}
+}
+.no-rgba #main article {
+	background-color: transparent;
+	background-image: url(w10.png);
+}
+#main article code {
+	font-family: Consolas, "Lucida Console", Monaco, monospace;
+	font-size: 0.92em;
+	background-color: #fff;
+	color: #333;
+	margin: 0 0.3em;
+	padding: 0.1em 0.3em;
+	${cr_s}
+}
+
+/******************************************* Folders */
+
+.thumbs,
+.folders {
+	table-layout: fixed;
+	width: ${tableWidth}px;
+	clear: both;
+	border-collapse: separate;
+	border-spacing: ${thumbGap}px;
+	margin-top: -${thumbGap}px;
+}
+.ie7 .folders {
+	margin-right: -20px;
+}
+.thumbs td,
+.folders td {
+	position: relative;
+	padding: 0;
+	vertical-align: top;
+	color: ${textColor};
+	overflow: hidden;
+	${cr_m}
+	${bs_sm}
+}
+.folders td {
+	width: <%= 100.0 / folderCols %>%;
+	max-width: ${folderCellWidth}px;
+	background-color: rgba(255,255,255,0.1);
+	transition: background-color 250ms linear;
+	overflow: hidden;
+	-webkit-transition: background-color 250ms linear;
+	-moz-transition: background-color 250ms linear;
+	-ms-transition: background-color 250ms linear;
+	-o-transition: background-color 250ms linear;
+}
+.folders.pages td {
+}
+.no-rgba .folders td {
+	background-color: transparent;
+	background-image: url(w10.png);
+}
+.folders td:hover {
+	background-color: rgba(255,255,255,0.2);
+}
+.no-rgba .folders td:hover {
+	background-color: transparent;
+	background-image: url(w20.png);
+	/*-ms-filter: "progid: DXImageTransform.Microsoft.gradient(startColorstr=#33ffffff, endColorstr=#33ffffff)";*/
+}
+.thumbs td.empty,
+.rgba .thumbs td.empty,
+.no-rgba .thumbs td.empty,
+.folders td.empty,
+.rgba .folders td.empty,
+.no-rgba .folders td.empty {
+	background-image: none;
+	background-color: transparent !important;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;
+	box-shadow: none;
+}
+.folders a {
+	color: ${linkColor};
+}
+.folders a:hover {
+	color: ${hoverColor};
+	outline: none;
+}
+
+.folders aside {
+	position: relative;
+<ja:if test="${folderVertical}">
+	margin: ${folderPad}px auto 0.5em auto;
+	display: table;
+</ja:if><ja:else>
+	float: left;
+	display: inline;
+	margin: ${folderPad}px <ja:if test="${longComments}" value="scroll">0</ja:if><ja:else>0.8em</ja:else> ${folderPad}px ${folderPad}px;
+</ja:else>
+	text-align: center;
+	border-collapse: collapse;
+	border-spacing: 0;
+	-webkit-text-size-adjust: 100%;
+}
+.ie7 .folders aside {
+	display: inline;
+}
+.folders aside a {
+	display: table-cell;
+	width: ${maxFolderThumbWidth}px;
+	height: ${maxFolderThumbHeight}px;
+	vertical-align: middle;
+}
+.ie7 .folders aside a {
+	display: block;
+}
+.folders aside a img {
+	max-width: ${maxFolderThumbWidth}px;
+	max-height: ${maxFolderThumbHeight}px;
+<ja:if test="${fixedShapeThumbs}" value="false">
+	width: auto;
+	height: auto;
+</ja:if>
+	vertical-align: top;
+	border: none;
+}
+.folders .data {
+	overflow-x: hidden;
+<ja:if test="${folderVertical}">
+	padding: 0.8em 10px;
+	max-width: <%= folderCellWidth - 20 %>px;
+	text-align: center;
+</ja:if><ja:else>
+	padding: ${folderPad}px ${folderPad}px ${folderPad}px <ja:if test="${longComments}" value="scroll">0.8em</ja:if><ja:else>0</ja:else>;
+	min-width: 70px;
+</ja:else>
+<ja:if test="${longComments}" value="scroll">
+	max-height: 14em;
+	overflow-y: auto;
+</ja:if>
+	-webkit-overflow-scrolling: touch;
+	overflow-scrolling: touch;
+}
+.folders.pages .data {
+	padding: 0.8em;
+}
+.folders h4 {
+	font-size: ${folderTitleSize};
+	line-height: 1.15;
+<ja:if not exists="headlineName">
+	font-weight: <ja:if test="<%= folderTitleSize.equals("100%") || folderTitleSize.equals("110%") || folderTitleSize.equals("120%") %>">bold</ja:if><ja:else>normal</ja:else>;
+</ja:if>
+	margin: 0 0 0.2em 0;
+/*	${ts_sm}*/
+}
+.folders h4:last-child {
+	margin-bottom: 0;
+}
+.folders .caption,
+.folders p {
+	margin-top: 0.5em;
+	margin-bottom: 0;
+}
+.folders p.info {
+	font-size: 85%;
+}
+.folders .readmore {
+	 font-size: 80%;
+	 background-color: rgba(255,255,255,0.2);
+	 ${cr_s}
+}
+
+.neighbors {
+	clear: both;
+	line-height: 40px;
+	margin: 0 ${thumbGap}px ${thumbGap}px ${thumbGap}px;
+}
+.neighbors a {
+	display: inline-block;
+	vertical-align: top;
+	color: ${textColor};
+	max-width: ${neighborLinkWidth}px;
+	max-height: 40px;
+	white-space: nowrap;
+	overflow: hidden;
+	padding: ${thumbPad}px;
+	background-color: rgba(255,255,255,0.1);
+	transition: background-color 250ms linear;
+	-webkit-transition: background-color 250ms linear;
+	-moz-transition: background-color 250ms linear;
+	-ms-transition: background-color 250ms linear;
+	-o-transition: background-color 250ms linear;
+	${cr_m}
+	${bs_sm}
+}
+.neighbors a span {
+	display: inline;
+	max-height: 40px;
+	margin: 0 .5em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+.no-rgba .neighbors a {
+	background-color: transparent;
+	background-image: url(w10.png);
+}
+.neighbors a:hover {
+	background-color: rgba(255,255,255,0.2);
+}
+.no-rgba .neighbors a:hover {
+	background-color: transparent;
+	background-image: url(w20.png);
+}
+.neighbors a.next {
+	float: right;
+}
+.neighbors a.previous {
+	float: left;
+}
+.neighbors a img {
+	display: inline-block;
+	width: auto;
+	height: 40px;
+	vertical-align: top;
+}
+.neighbors a.next img {
+	float: right;
+}
+.neighbors a.previous img {
+	float: left;
+}
+
+/******************************************* Thumbnail grid on index page */
+
+.thumbs td {
+	width: <%= 100.0 / thumbCols %>%;
+	padding: 0;
+	background-color: rgba(255,255,255,0.1);
+}
+/*.thumbs table td {
+	width: ${thumbCellWidth}px;
+}*/
+.thumbs td > a {
+	display: block;
+	position: relative;
+	height: ${maxThumbHeight}px;
+	line-height: ${thumbLineHeight}px;
+	overflow: hidden;
+	text-align: center;
+<ja:if test="${captionPlacement}" value="tooltip">
+	padding: ${thumbPad}px;
+	${cr_m}
+</ja:if><ja:else>
+	padding: ${thumbPad}px ${thumbPad}px <%= Math.min(thumbPad, 10) %>px ${thumbPad}px;
+	${cr_mt}
+</ja:else>
+	transition: background-color 250ms linear;
+	-webkit-transition: background-color 250ms linear;
+	-moz-transition: background-color 250ms linear;
+	-ms-transition: background-color 250ms linear;
+	-o-transition: background-color 250ms linear;
+	-webkit-text-size-adjust: 100%;
+}
+.no-rgba .thumbs td > a {
+	background-color: transparent;
+	background-image: url(w10.png);
+}
+.thumbs td > a:hover, 
+.thumbs td > a:focus {
+	background-color: rgba(255,255,255,0.2);
+	color: ${hoverColor};
+	outline: none;
+}
+.no-rgba .thumbs td > a:hover, 
+.no-rgba .thumbs td > a:focus {
+	background-color: transparent;
+	background-image: url(w20.png);
+	/*-ms-filter: "progid: DXImageTransform.Microsoft.gradient(startColorstr=#33ffffff, endColorstr=#33ffffff)";*/
+}
+.thumbs td > a.active {
+	background-color: rgba(255,255,255,0.4);
+}
+.no-rgba .thumbs td > a.active {
+	background-color: transparent;
+	background-image: url(w40.png);
+}
+.thumbs td > a img {
+	display: inline;
+	vertical-align: middle;
+	max-width: ${maxThumbWidth}px;
+	max-height: ${maxThumbHeight}px;
+	border: 0;
+	outline: none;
+}
+.thumbs td > a b {
+	vertical-align: middle;
+	display: inline-block;
+	height: 100%;
+	font-size: 1px;
+}
+.thumbs td > .caption {
+	margin: 0;
+	padding: 0.5em 8px;
+	line-height: 1.2;
+	max-width: <%= thumbCellWidth - 16 %>px;
+	overflow-x: hidden;
+<ja:if test="${longComments}" value="scroll">
+	max-height: 9.4em;
+	overflow-y: auto;
+</ja:if>
+	text-align: center;
+	-webkit-overflow-scrolling: touch;
+	overflow-scrolling: touch;
+}
+.thumbs td > .caption span.nr {
+	font-size: 80%;
+	line-height: 1.6;
+	vertical-align: top;
+	font-weight: normal;
+	font-style: normal;
+	padding: 0px 3px;
+	<%= util.getTextColor(textColor) %>;
+	background-color: ${textColor};
+	${cr_s}
+}
+.thumbs td > .caption a.original {
+	display: inline-block;
+	vertical-align: top;
+	margin: 0 0 0 0.5em;
+	padding: 2px 4px;
+	font-size: 80%;
+<ja:if test="${lightStyle}">
+	background-color: rgba(255,255,255,0.5);
+	color: #444;
+</ja:if><ja:else>
+	background-color: rgba(0,0,0,0.4);
+	color: #ddd;
+</ja:else>
+	${cr_s}
+}
+.thumbs td > .caption .comment {
+	font-size: 90%;
+	margin-top: 0.2em;
+}
+.newlabel {
+	display: inline;
+	position: absolute;
+	padding: 4px 2px 4px 4px;
+	border-right: 3px solid #c00;
+	background-color: #A00;
+	background-color: rgba(192,0,0,0.6);
+	color: #ddd;
+	font-size: 66.7%;
+}
+.thumbs .newlabel {
+	line-height: 12px;
+	right: ${thumbPad}px;
+	top: ${thumbPad}px;
+}	
+.folders .newlabel {
+	line-height: 12px;
+	right: 0;
+	top: 0;
+}
+.scrollbox .newlabel {
+	line-height: 1em;
+	right: 3px;
+	top: 3px;
+	font-size: 55%;
+}	
+
+
+.cont.load .wait {
+	display: inline;
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	min-height: 20px;
+	background-image: url(load.gif);
+	background-position: center center;
+	background-repeat: no-repeat;
+	z-index: 99;
+}
+
+/******************************************* Bulk actions */
+
+.checkbox {
+	display: inline;
+	position: absolute;
+	border: 1px solid rgba(255,255,255,0.1);
+	${bis_sm}
+}
+.thumbs .checkbox {
+	width: 20px;
+	height: 20px;
+	left: ${thumbPad}px;
+	top: ${thumbPad}px;
+}
+.gallery .main .checkbox {
+	width: 24px;
+	height: 24px;
+	left: ${borderWidth}px;
+	top: ${borderWidth}px;
+	z-index: 9999;
+}
+.gallery .main.video .checkbox {
+	display: none;
+}
+.gallery .main:hover .checkbox,
+.thumbs td > a:hover .checkbox {
+	border: 1px solid rgba(255,255,255,0.4);
+}
+.checkbox.active {
+	background-color: rgba(0,0,0,0.3);
+	background-image: url(check.png);
+	background-repeat: no-repeat;
+}
+.thumbs td > a .checkbox.active {
+	background-position: 0 0;
+}
+.gallery .main .checkbox.active {
+	background-position: 2px 2px;
+}
+.thumbs td > a:hover .checkbox.active {
+	background-position: 0 -40px;
+}
+.gallery .main:hover .checkbox.active {
+	background-position: 2px -38px;
+}
+
+/******************************************* Actions */
+
+.actions {
+	margin: 10px ${thumbGap}px;
+	min-height: 30px;
+	${cr_m}
+}
+.actions:first-child {
+	margin-top: 0;
+}
+.bulkactions {
+	float: right;
+	display: inline-block;
+	margin-left: 15px;	
+}
+.bulkactions span,
+.bulkactions .shares {
+	font-size: 85%;
+	display: inline-block;
+	vertical-align: top;
+	margin: 0;
+	padding: 3px 6px;
+	line-height: 24px;
+}
+.bulkactions span a {
+	margin: 0 .1em;
+	padding: .1em .4em;
+	border: 1px solid ${textColor};
+	${cr_s}
+}
+.bulkactions nav.buttons {
+	display: inline-block;
+}
+
+/******************************************* Map on index page */
+
+#map {
+	display: block;
+	margin: <ja:if test="${splashVertical}">0</ja:if><ja:else>0 ${thumbGap}px</ja:else>;
+	padding: ${thumbPad}px;
+	background-color: rgba(255,255,255,0.1);
+	overflow: hidden;
+	${cr_m}
+	${bs_sm}
+}
+.no-rgba #map {
+	background-color: transparent;
+	background-image: url(w10.png);
+}
+#map .cont {
+	position: relative;
+	width: <%= (splashVertical? folderImageWidth : galleryWidth) - 2 * thumbPad %>px;
+	height: 300px;
+}
+
+/******************************************* Map on index page */
+
+.fb-comments, 
+.disqus-comments {
+	margin-top: ${gutter}px;
+<ja:if not test="${splashVertical}">
+	margin-left: ${thumbGap}px;
+	margin-right: ${thumbGap}px;
+</ja:if>
+}
+.disqus-comments {
+	padding: ${thumbPad}px;
+	background-color: rgba(255,255,255,0.1);
+	width: <%= (splashVertical? folderImageWidth : galleryWidth) - 2 * thumbPad %>px;
+	${cr_m}
+	${bs_sm}
+}
+
+#slide .fb-comments,
+#slide .disqus-comments {
+	padding: 0 10px 0 0;
+	margin: 0;
+	height: 170px;
+	overflow-x: hidden;
+	overflow-y: auto;
+	-webkit-overflow-scrolling: touch;
+	overflow-scrolling: touch;
+}
+
+/******************************************* Share box */
+
+.shareactions > .shares {
+	font-size: 85%;
+	margin: 4px 15px 0 4px;
+}
+.shares .likebtn {
+	height: 22px;
+	background-position: 0 0;
+	overflow: hidden;
+}
+.shares > a {
+<ja:if test="${shareLabelsVisible}">
+	display: block;
+	padding: 1px 4px 1px 26px;
+	line-height: 20px;
+	height: 20px;
+</ja:if><ja:else>
+	display: inline-block;
+	width: 22px;
+	height: 22px;
+</ja:else>
+	overflow: hidden;
+	background-repeat: no-repeat;
+	background-image: url(share_dark.png);
+}
+.hook-s,
+.shares > a:hover {
+	background-image: url(share.png);
+}
+.shares a.facebook { background-position: -1px -25px; }
+.shares a.twitter { background-position: -1px -49px; }
+.shares a.digg { background-position: -1px -73px; }
+.shares a.myspace { background-position: -1px -97px; }
+.shares a.delicious { background-position: -1px -121px; }
+.shares a.stumbleupon { background-position: -1px -145px; }
+.shares a.email { background-position: -1px -169px; }
+.shares a.reddit { background-position: -1px -193px; }
+.shares a.tumblr { background-position: -1px -217px; }
+.shares a.flickr { background-position: -1px -241px; }
+.shares a.foursquare { background-position: -1px -265px; }
+.shares a.gplus { background-position: -1px -289px; }
+.shares a.linkedin { background-position: -1px -313px; }
+.shares a.picasa { background-position: -1px -337px; }
+.shares a.skype { background-position: -1px -361px; }
+.shares a.vimeo { background-position: -1px -385px; }
+.shares a.youtube { background-position: -1px -409px; }
+.shares a.phone { background-position: -1px -433px; }
+.shares a.jalbum { background-position: -1px -457px; }
+.shares a.pinterest { background-position: -1px -481px; }
+.shares a.instagram { background-position: -1px -505px; }
+.shares a.github { background-position: -1px -529px; }
+.shares a.rss { background-position: -1px -553px; }
+
+.shares > span {
+	display: inline-block;
+	line-height: 20px;
+	padding: 1px 3px;
+	vertical-align: top;
+}
+
+<ja:if test="${shareBoxType}" value="dropdown">
+.shares {
+	width: 120px;
+}
+.shares .likebtn {
+	display: block;
+	margin-bottom: 4px;
+	overflow: hidden;
+}
+.shares > a {
+	color: #000;
+}
+.shares > a:hover {
+	color: #fff;
+	background-color: #222;
+}
+</ja:if><ja:else>
+.shares .likebtn {
+	display: inline-block;
+	margin-right: 4px;
+	vertical-align: top;
+	margin-top: 1px;
+}
+.shares > a {
+	display: inline-block;
+	background-image: url(share_${btnColor}.png);
+}
+</ja:else>
+
+/*********************************** Regions */
+
+.regions-cont {
+	position: absolute;
+}
+.regions-cont a {
+	position: absolute;
+	display: block;
+	${cr_m}
+	border: 3px solid #fff;
+	opacity: 0;
+	cursor: pointer;
+	background-image: url(blank.png);
+}
+.regions-cont a,
+.regions-cont a:hover,
+.regions-cont a.active 
+.regions-cont.active a,
+.regions-cont.active a.active,
+.regions-cont.active a:hover {
+	transition: opacity 500ms ease;
+	-webkit-transition: opacity 500ms ease;
+	-moz-transition: opacity 500ms ease;
+	-ms-transition: opacity 500ms ease;
+}
+.regions-cont a:hover,
+.regions-cont a.active,
+.regions-cont.active a.active,
+.regions-cont.active a:hover {
+	opacity: 1;
+}
+.touch .regions-cont.active a {
+	opacity: 0.6;
+}
+.regions-cont.active a {
+	opacity: 0.3;
+}
+.regions-cont a span {
+	position: absolute;
+	top: 0;
+	right: 0;
+	max-width: 85%;
+	padding: 0 4px 4px 6px;
+	background-color: #fff;
+	font-size: 80%;
+	color: #333;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+	border-radius: 0 ${crs}px 0 ${crs}px;
+}
+.touch .regions-cont a span,
+.regions-cont a:hover span {
+	max-width: none;
+}
+
+/**************************************************************** Images page */
+
+.gallery {
+	position: absolute;
+	position: fixed;
+	display: none;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: ${bottom}px;
+	z-index: 10000;
+	${bgColor}
+	overflow: hidden;
+	-webkit-text-size-adjust: 120%;
+	-webkit-overflow-scrolling: auto;
+	touch-action: none;
+}
+#slide .gallery {
+	display: block;
+}
+.gallery a {
+	text-decoration: none;
+	outline: none;
+}
+.gallery .navigation {
+	position: absolute;
+	left: 0;
+	right: 0;
+	margin: 0;
+	z-index: 10000;
+}
+.gallery .navigation.hide {
+	top: -${thumbScrollerHeight}px;
+}
+.gallery .navigation nav {
+	display: none;
+	position: absolute;
+<ja:if test="${stickControlsToTop}">
+	bottom: -75px;
+	padding-top: 5px;
+	${cr_lb}
+</ja:if>
+<ja:else>
+	bottom: -90px;
+	${cr_l}
+</ja:else>
+	left: 50%;
+	margin-left: -205px;
+	height: 70px;
+	background-color: rgba(0,0,0,0.8);
+	overflow: hidden;
+	white-space: nowrap;
+	${bs_md}
+	-webkit-text-size-adjust: 100%;
+}
+.no-rgba .gallery .navigation nav {
+	background-color: transparent;
+	background-image: url(k80.png);
+}
+.gallery .navigation nav a {
+	display: inline-block;
+	width: 50px;
+	height: 70px;
+	line-height: 70px;
+	background-image: url(controls.png);	
+	background-repeat: no-repeat;
+	background-position: -50px 0;
+}
+.hook-c {
+	background-image: url(controls.png);	
+}
+.gallery .navigation nav a.prev {
+	background-position: -50px 0;
+	width: 70px;
+}
+.gallery .navigation nav a.prev:hover {
+	background-position: -50px -70px;
+}	
+.gallery .navigation nav a.up {
+	background-position: -120px 0;
+}
+.gallery .navigation nav a.up:hover {
+	background-position: -120px -70px;
+}
+.gallery .navigation nav a.resize {
+	background-position: -170px 0;
+}
+.gallery .navigation nav a.resize:hover {
+	background-position: -170px -70px;
+}
+.gallery .navigation nav a.noresize {
+	display: none;
+	background-position: -220px 0;
+}
+.gallery .navigation nav a.noresize:hover {
+	background-position: -220px -70px;
+}
+.gallery .navigation nav a.showinfo {
+	background-position: -270px 0;
+}
+.gallery .navigation nav a.showinfo:hover {
+	background-position: -270px -70px;
+}
+.gallery .navigation nav a.hideinfo {
+	display: none;
+	background-position: -320px 0;
+}
+.gallery .navigation nav a.hideinfo:hover {
+	background-position: -320px -70px;
+}
+.gallery .navigation nav a.showthumbs {
+	background-position: -370px 0;
+}
+.gallery .navigation nav a.showthumbs:hover {
+	background-position: -370px -70px;
+}
+.gallery .navigation nav a.hidethumbs {
+	display: none;
+	background-position: -420px 0;
+}
+.gallery .navigation nav a.hidethumbs:hover {
+	background-position: -420px -70px;
+}
+.gallery .navigation nav a.play {
+	width: 70px;
+	background-position: -470px 0;
+}
+.gallery .navigation nav a.play:hover {
+	background-position: -470px -70px;
+}
+.gallery .navigation nav a.pause {
+	display: none;
+	width: 70px;
+	background-position: -540px 0;
+}
+.gallery .navigation nav a.pause:hover {
+	background-position: -540px -70px;
+}
+.gallery .navigation nav a.next {
+	width: 70px;
+	background-position: -610px 0;
+}
+.gallery .navigation nav a.next:hover {
+	background-position: -610px -70px;
+}
+<ja:if test="${hideFitToggle}">
+.gallery .navigation nav a.resize,
+.gallery .navigation nav a.noresize {
+	display: none;
+}
+</ja:if>
+
+.gallery .scrollbox {
+	position: relative;
+	top: 0;
+	left: 0;
+	display: block;
+	width: ${thumbScrollerWidth}px;
+	height: ${thumbScrollerHeight}px;
+	max-width: 80%;
+	margin: 0 auto;
+	${cr_lb}
+	overflow: hidden;
+	background-color: rgba(0,0,0,0.6);
+	transition: background-color 500ms;
+	-moz-transition: background-color 500ms;
+	-webkit-transition: background-color 500ms;
+	-ms-touch-action: none;
+	touch-action: none;
+	${bs_md}
+}
+.rgba.touch .gallery .scrollbox,
+.rgba .gallery .scrollbox:hover {
+	background-color: rgba(0,0,0,0.8);
+}
+.no-rgba .gallery .scrollbox {
+	background-color: transparent;
+	background-image: url(k60.png);
+}
+.no-rgba .gallery .scrollbox:hover {
+	background-color: transparent;
+	background-image: url(k80.png);
+}
+.gallery .scrollbox .wrap {
+	position: relative;
+	top: 5px;
+	margin: 0 40px;
+	height: ${scrollWrapHeight}px;
+	overflow: hidden;
+}
+.gallery .scrollbox ul.cont {
+	position: absolute;
+	left: 0;
+	top: 0;
+	bottom: 0;
+	margin: 0;
+	padding: 0;
+	white-space: nowrap;
+	-webkit-text-size-adjust: 100%;
+	-ms-touch-action: pan-x;
+	touch-action: pan-x;
+}
+.gallery .scrollbox ul.cont li {
+	display: table;
+	float: left;
+	display: inline;
+	position: relative;
+	width: ${scrollCellWidth}px;
+	height: ${scrollCellHeight}px;
+	overflow: hidden;
+	margin: ${scrollCellGap}px;
+	text-align: center;
+}
+.gallery .scrollbox .cont a {
+	display: table-cell;
+	vertical-align: middle;
+	position: relative;
+	padding: ${scrollCellPad}px;
+	margin-right: ${scrollCellGap}px;
+	width: ${reducedThumbWidth}px;
+	height: ${reducedThumbHeight}px;
+	text-align: center;
+}
+.gallery .scrollbox .cont a img {
+	max-width: ${reducedThumbWidth}px;
+	max-height: ${reducedThumbHeight}px;
+	vertical-align: middle;
+}
+.gallery .scrollbox .cont a:hover, 
+.gallery .scrollbox .cont a:focus {
+	background-color: rgba(255,255,255,0.2);
+	outline: none;
+}
+.no-rgba .gallery .scrollbox .cont a:hover, 
+.no-rgba .gallery .scrollbox .cont a:focus {
+	background-image: url(w20.png);
+}
+.gallery .scrollbox .cont a.active {
+	background-color: rgba(255,255,255,0.4);
+}
+.no-rgba .gallery .scrollbox .cont a.active {
+	background-color: transparent;
+	background-image: url(w40.png);
+}
+.gallery .scrollbox .scleft,
+.gallery .scrollbox .scright {
+	position: absolute;
+	top: 5px;
+	width: 24px;
+	height: ${scrollWrapHeight}px;
+	background-repeat: no-repeat;
+	background-position: left center;
+}	
+.hook-s,
+.gallery .scrollbox .scleft,
+.gallery .scrollbox .scright {
+	background-image: url(scroll.png);
+}
+.gallery .scrollbox .scleft {
+	left: 10px;
+	background-position: 0 center;
+}
+.gallery .scrollbox .scright {
+	right: 10px;
+	background-position: -48px center;
+}
+.gallery .scrollbox .scleft:hover {
+	background-position: -24px center;
+}
+.gallery .scrollbox .scright:hover {
+	background-position: -72px center;
+}
+
+.gallery .img {
+	position: absolute;
+	left: 0;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	overflow: hidden;
+	-webkit-overflow-scrolling: auto;
+}
+#slide .gallery .img {
+	display: none;
+}
+.gallery .img .main {
+	position: relative;
+	display: inline-block;
+	${borColor}
+	padding: ${borderWidth}px;
+	${bs_xd}
+}
+.gallery .img .main.smooth {
+	-webkit-transition: -webkit-transform 0.6s ease-out;
+	transition: -webkit-transform 0.6s ease-out, transform 0.6s ease-out, -ms-transform 0.6s ease-out, -o-transform 0.6s ease-out;
+}
+.gallery .img .image > img,
+.gallery .img .image > a > img {
+	vertical-align: top;
+	width: 100%;
+	height: 100%;
+	cursor: default;
+	-ms-interpolation-mode: bicubic;
+	-ms-touch-action: none;
+	touch-action: none;
+	${cr_img}
+}
+.gallery .img .main.image {
+	-webkit-transform: translate3d(0,0,0);
+	-moz-transform: translate3d(0,0,0);
+	-ms-transform: translate3d(0,0,0);
+	-o-transform: translate3d(0,0,0);
+	transform: translate3d(0,0,0);
+	-ms-touch-action: none;
+	touch-action: none;
+	${cr_imgc}
+}
+.gallery .img .other {
+	width: ${otherWidth}px;
+	text-align: center;
+	background-color: rgba(240,240,240,0.85);
+	color: #555;
+	-ms-touch-action: none;
+	touch-action: none;
+	${cr_m}
+}
+.no-rgba .gallery .img .other {
+	background-color: transparent;
+	background-image: url(w80.png);
+}
+.gallery .img .other > a {
+	display: block;
+	margin: 15px 15px 0 15px;
+	padding: 20px 0;
+	border-bottom: 1px solid #ccc;
+}
+.gallery .img .other > a > img {
+	min-height: 128px;
+}
+.gallery .img .other p {
+	margin: 10px 15px 15px 15px;
+	overflow: hidden;
+}
+.gallery .img .main.video,
+.gallery .img .main.audio {
+	-ms-touch-action: none;
+	touch-action: none;
+	overflow: hidden;
+}
+.gallery .img .main.video > a,
+.gallery .img .main.audio > a {
+	display: block;
+	height: 100%;
+	margin-bottom: ${borderWidth}px;
+}
+.gallery .img .main.video > a > img,
+.gallery .img .main.audio > a > img {
+	width: 100%;
+	height: 100%;
+}
+.gallery .img .main.video.jp-video-full {
+	padding: 0 !important;
+}
+.gallery > .wait {
+	display: none;
+	position: absolute;
+	left: 0;
+	top: 0;
+	right: 0;
+	bottom: ${bottom}px;
+	background-image: url(wait.gif);
+	background-position: center center;
+	background-repeat: no-repeat;
+	z-index: 3;
+}
+.gallery .bottom {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	z-index: 11;
+}
+.gallery .bottom.hide {
+	bottom: -100%;
+}
+.gallery .bottom .cont {
+	position: relative;
+	width: ${captionWidth}px;
+	max-width: 80%;
+	margin: 0 auto;
+	padding: 5px 8px 6px 15px;
+	text-align: left;
+	${cr_lt}
+	color: ${textColor};
+	background-color: rgba(0,0,0,0.4);
+	transition: background-color 500ms;
+	-moz-transition: background-color 500ms;
+	-webkit-transition: background-color 500ms;
+	${bs_md}
+}
+.no-rgba .gallery .bottom .cont {
+	background-color: transparent;
+	background-image: url(k40.png);
+}
+.rgba.touch .gallery .bottom .cont,
+.gallery .bottom .cont:hover {
+	background-color: rgba(0,0,0,0.9);
+}
+.no-rgba .gallery .bottom .cont:hover {
+	background-image: url(k80.png);
+}
+.gallery .bottom .cont:before, 
+.gallery .bottom .cont:after { content: "\0020"; display: block; height: 0; visibility: hidden; clear: both; }
+.gallery .bottom h2 {
+	margin-top: 6px;
+	font-size: 140%;
+}
+.gallery .bottom h3 {
+	margin-top: 8px;
+	font-size: 125%;
+}
+.gallery .bottom .caption {
+	margin-top: 10px;
+}
+.gallery .bottom .caption a {
+	color: ${linkColor};
+}
+.gallery .bottom .caption a:hover {
+	color: ${hoverColor};
+}
+.gallery .bottom .comment {
+	max-height: 12em;
+	overflow: auto;
+}
+.gallery .bottom .comment a {
+	text-decoration: underline;
+}
+nav.buttons {
+	height: 28px;
+	line-height: 24px;
+	font-size: 85%;
+	${cr_s}
+	border: 1px solid #181818;
+	color: #bbb;
+	background-color: #181818;
+	z-index: 999;
+	background-image: -webkit-linear-gradient(top, rgba(51,51,51,1), rgba(34,34,34,1));
+	background-image: -moz-linear-gradient(top, rgba(51,51,51,1), rgba(34,34,34,1));
+	background-image: -o-linear-gradient(top, rgba(51,51,51,1), rgba(34,34,34,1));
+	background-image: -ms-linear-gradient(top, rgba(51,51,51,1), rgba(34,34,34,1));
+	background-image: linear-gradient(top, rgba(51,51,51,1), rgba(34,34,34,1));
+	filter: progid: DXImageTransform.Microsoft.Gradient(startColorstr='#FF333333',EndColorStr='#FF222222');
+	-moz-background-clip: padding;
+	-webkit-background-clip: padding-box;
+	background-clip: padding-box; 
+ 	${bs_sd}
+}
+.gallery .bottom nav.buttons {
+	float: right;
+	display: inline;
+	margin: 5px 0 5px 10px;
+}
+nav.buttons a {
+	display: inline-block;
+	height: 28px;
+	padding: 0 6px 0 30px;
+	line-height: 28px;
+	white-space: nowrap;
+	background-image: url(buttons.png);
+	background-position: 6px 0;
+	background-repeat: no-repeat;
+	border-left: 1px solid #000;
+	color: #ccc;
+	cursor: default;
+}
+<ja:if not test="${buttonLabelsVisible}">
+.gallery .bottom nav.buttons a {
+	width: 20px;
+	padding: 0 6px;
+}
+</ja:if>
+nav.buttons a:first-child {
+	border-left: none;
+	${cr_sl}
+}
+nav.buttons a:last-child {
+	${cr_sr}
+}
+nav.buttons a:hover {
+	color: #fff;
+}
+nav.buttons a.active {
+	background-color: #000;
+	border-left-color: #111;
+	color: #aaa;
+}
+.gallery .bottom .nr {
+	float: right;
+	display: inline;
+	margin: 5px 0 5px 10px;
+	line-height: 26px;
+	padding: 0;
+	white-space: nowrap;
+}
+.gallery .bottom .meta .icon {
+	background-position: 0 -1px;
+}
+nav.buttons a.meta-icon {
+	background-position: 6px -1px;
+}
+.gallery .bottom .map .icon {
+	background-position: 0 -33px;
+}
+nav.buttons a.map-icon {
+	background-position: 6px -33px;
+}
+.gallery .bottom .shop .icon {
+	background-position: 0 -65px;
+}
+nav.buttons a.shop-icon {
+	background-position: 6px -65px;
+}
+nav.buttons a.link-icon {
+	background-position: 6px -97px;
+}
+.gallery .bottom .share .icon {
+	background-position: 0 -129px;
+}
+nav.buttons a.share-icon {
+	background-position: 6px -129px;
+}
+.gallery .bottom .print .icon {
+	background-position: 0 -161px;
+}
+nav.buttons a.print-icon {
+	background-position: 6px -161px;
+}
+.gallery .bottom .comments .icon {
+	background-position: 0 -193px;
+}
+nav.buttons a.comments-icon {
+	background-position: 6px -193px;
+}
+.gallery .bottom .regions .icon {
+	background-position: 0 -225px;
+}
+nav.buttons a.regions-icon {
+	background-position: 6px -225px;
+}
+.gallery .bottom .fotomoto .icon {
+	background-position: 0 -257px;
+}
+nav.buttons a.fotomoto-icon,
+nav.buttons a.mostphotos-icon {
+	background-position: 6px -257px;
+}
+.gallery .bottom .custom .icon {
+	background-position: 0 -289px;
+}
+nav.buttons a.custom-icon {
+	background-position: 6px -289px;
+}
+.gallery .bottom .email .icon {
+	background-position: 0 -321px;
+}
+nav.buttons a.email-icon {
+	background-position: 6px -321px;
+}
+
+.gallery .bottom .panel {
+	clear: both;
+	position: relative;
+	font-size: 85%;
+	color: #ccc;
+	margin-top: 10px;
+	padding-left: 30px;
+	color: ${textColor};
+	content: '&nbsp;';
+}
+.gallery .bottom .icon {
+	position: absolute;
+	left: 0;
+	top: -2px;
+	width: 20px;
+	height: 24px;
+	background-image: url(buttons.png);
+	background-repeat: no-repeat;
+}
+.gallery .bottom .meta b {
+	color: #fff;
+}
+.gallery .bottom .map .mapcont {
+	position: relative; 
+	overflow: hidden;
+	height: 240px;
+}
+.gallery .bottom .shop .icon {
+	top: -1px;
+}
+.shop form {
+	vertical-align: top;
+	display: inline-block;
+	margin-right: 0.5em;
+	padding: 2px 0;
+	line-height: 25px;
+	white-space: nowrap;
+	height: 26px;
+}
+.shop input,
+.shop select {
+	margin: 0 4px;
+	outline: none;
+	${cr_s}
+}
+.shop input {
+	border: none;
+	padding: 4px 6px;
+}
+.shop input[type="image"] {
+	padding: 2px 0;
+}
+.shop select {
+	padding: 3px 5px;
+	background-color: #fff;
+	border: 1px solid #999;
+	/*margin: -2px 6px 0 0;*/
+}
+.shop select:first-child {
+	margin-left: 0;
+}
+.shop .copies,
+.shop .coupon {
+	${bis_sm}
+}
+.shop .copies {
+	width: 2em;
+}
+.shop .count {
+}
+.shop .total,
+.shop .discount {
+	display: inline-block;
+	margin: 0 4px;
+	line-height: 16px;
+	${cr_s}
+}
+.shop .discount {
+	padding: 4px 4px;
+	background-color: #d33;
+	color: #fff;
+}
+.shop .total {
+	padding: 4px 8px;
+	background-color: #444;
+	text-align: right;
+	color: #fff;
+}
+.shop .coupon {
+	width: 7em;
+	margin: 0 0 0 6px;
+	background-color: #ffdca0;
+}
+.shop .coupon::-webkit-input-placeholder {
+	font-size: 80%; 
+}
+.shop .coupon::-moz-placeholder {
+	font-size: 80%; 
+}
+.shop .coupon::-ms-input-placeholder {  
+	font-size: 80%; 
+}
+.shop .redeem {
+	display: inline-block;
+	position: relative;
+	top: 1px;
+	left: -21px;
+	width: 20px;
+	margin-right: -21px;
+	height: 20px;
+	line-height: 20px;
+	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAA3NCSVQICAjb4U/gAAAAHlBMVEX///8iIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiKzbYCPAAAACnRSTlMAESJ3iJmqzN3/14XUmgAAAAlwSFlzAAALEgAACxIB0t1+/AAAABx0RVh0U29mdHdhcmUAQWRvYmUgRmlyZXdvcmtzIENTNui8sowAAABGSURBVAiZY2DAApjcUhSYQQzP6ZVTPIE0y1QBxsiZQIZmAAODJYjhKcDAPBPESIdpgjOAUgyMDFDFrI0w7Q4wA+FWYLMaAP99DZ459gmkAAAAAElFTkSuQmCC);	
+	background-position: center center;
+	background-repeat: no-repeat;
+}
+.paypalbtn {
+	line-height: 18px;
+	padding: 3px 8px;	
+	border: 1px solid #e79e26;
+	background-color: #ffbb31;
+	background-image: -moz-linear-gradient(top, #feb 0%,#fa0 100%);
+	background-image: -webkit-linear-gradient(top, #feb 0%,#fa0 100%);
+	background-image: -o-linear-gradient(top, #feb 0%,#fa0 100%);
+	background-image: -ms-linear-gradient(top, #feb 0%,#fa0 100%);
+	background-image: linear-gradient(top, #feb 0%,#fa0 100%);
+	filter: progid: DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#ffeebb',endColorstr='#ffaa00');
+	${tb_s}
+	${cr_s}
+}	
+.paypalbtn#shopAdd {
+	font-weight: bold;
+}
+
+#bgaudio {
+	position: fixed;
+	right: <ja:if test="${smartScroll}">0</ja:if><ja:else>20</ja:else>px;
+	top: 0;
+	width: 100px;
+	height: 34px;
+	z-index: 99999;
+	${bs_mm}
+}
+
+b, strong {
+	font-weight: bold;
+}
+i, em {
+	font-style: italic;
+}
+
+<ja:if exists="backgroundImage">
+#mainbg, .gallery {
+	background-image: url(${backgroundImage});
+	<ja:if exists="backgroundPos">background-position: ${backgroundPos};</ja:if>
+	<ja:if test="${backgroundRepeat}" not value="stretch">background-repeat: ${backgroundRepeat};</ja:if>
+	<ja:else>-moz-background-size: 100% 100%;
+	background-size: 100% 100%;
+}
+#widgetbg {
+	background: ${backgroundColor} url(${backgroundImage}) center top no-repeat;
+	-moz-background-size: 100% auto;
+	background-size: 100% auto;
+}
+.no-backgroundsize #widgetbg, .no-backgroundsize #mainbg, .no-backgroundsize .gallery {
+	background-repeat: repeat;</ja:else>
+}
+</ja:if>
+
+<%-- Video player styles --%>
+<ja:include page="includes/jplayer.jalbum.css" />
+<ja:if test="<%= playerTheme != void && (playerTheme.equals("light") || (playerTheme.equals("auto") && lightStyle))%>"><ja:include page="includes/jplayer.jalbum.light.css" /></ja:if>
+
+<%-- Custom page templates --%>
+<ja:include page="templates/styles.css" />
+
+<%-- HTML5 Boilerplate postfix --%>
+<ja:include page="includes/html5bp-postfix.css" />
+
+<%-- Chosen skin style --%>
+<ja:include page="styles/${style}" />
+
+<%-- CSS hooks added through the user interface --%>
+<ja:if exists="cssHook"><%= engine.processTemplate(cssHook) %></ja:if>

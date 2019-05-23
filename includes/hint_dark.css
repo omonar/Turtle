@@ -1,0 +1,34 @@
+.tooltip {
+	color:#ccc;
+	background-color:rgba(17,17,17,0.9);
+}
+.no-rgba .tooltip {
+	background-color:transparent;
+	background-image:url(k90.png);
+}
+.tooltip > .nub {
+	border-color: transparent transparent rgba(17,17,17,0.9) transparent;
+}
+.tooltip.valign-top > .nub {
+	border-color: rgba(17,17,17,0.9) transparent transparent transparent;
+}
+.tooltip.valign-middle.align-left > .nub {
+	border-color: transparent transparent transparent rgba(17,17,17,0.9);
+	right: -16px;
+}
+.tooltip.valign-middle.align-right > .nub {
+	border-color: transparent rgba(17,17,17,0.9) transparent transparent;
+}
+.tooltip a {
+	color:${linkColor};
+}
+.tooltip a:hover {
+	color:${hoverColor};
+}
+.tooltip .breadcrumb a:hover {
+	background-color:rgba(255,255,255,0.2);
+}
+.tooltip .breadcrumb a:hover {
+	background-color:transparent;
+	background-image:url(w20.png);
+}

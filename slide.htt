@@ -1,0 +1,153 @@
+<ja:include page="page-header.inc" />
+
+	<div class="gallery" data-role="gallery">
+		<div <ja:if test="${thumbnailsVisible}">class="navigation"</ja:if><ja:else>class="navigation hide"</ja:else>>
+			<div class="scrollbox">
+				<div class="wrap"><ul class="cont load">
+					<% 	int curr = imageNum; 
+						String m; 
+						int mapid = 0; 
+					%> 
+					<ja:fileiterator exclude="folder,webLocation" start="-5" count="16" nodirs><li><a <%
+						// Link	
+						out.print(util.attr("href", util.urlEncode(label + util.pageExt)));
+						// Caption
+						out.print(util.attr("title", util.stripQuot(util.getThumbCaption(currentObject))));
+						if (imageNum == curr) {
+							out.print(util.attr("class", "active"));
+						}
+						out.print(">");
+						// Thumbnail						
+						out.print("<img");
+						out.print(util.attr("src", thumbPath));
+						out.print(util.attr("height", Math.round(reduceThumbs * thumbHeight)));
+						out.print(util.attr("width", Math.round(reduceThumbs * thumbWidth)));
+						if (addAltTags) {
+							out.print(util.attr("alt", fileName));
+						}
+						if (!util.isEmpty(m = util.getLocation(currentObject))) {
+							out.print(util.data("map", m));
+							out.print(util.data("mapid", mapid++));
+						}
+					%>></a></li></ja:fileiterator>
+				</ul></div>
+			</div>
+			<nav class="controls clearfix"><%--
+			--%><a href="<ja:if exists="previousPage">${previousPage}</ja:if><ja:else><% 
+					if (afterLast.equals("startover") && totalImages > 1) 
+						out.print(lastPage); 
+					else if (afterLast.equals("nextFolder") && previousFoldersLast != null) 
+						out.print(previousFoldersLast);
+					else
+						out.print("javascript:void(0)");
+				%></ja:else>" class="prev" title="$text.previousPicture">&nbsp;</a><%--
+				--%><a class="up" href="../${indexPage}" title="$text.backToIndex">&nbsp;</a><%--
+				--%><ja:if not test="${hideFitToggle}"><a class="resize" title="$text.fitToScreen">&nbsp;</a><a class="noresize" title="$text.oneToOneSize">&nbsp;</a></ja:if><%--
+				--%><a class="hidethumbs" title="$text.hideThumbs">&nbsp;</a><a class="showthumbs" title="$text.showThumbs">&nbsp;</a><%--
+				--%><a class="hideinfo" title="$text.hideInfo">&nbsp;</a><a class="showinfo" title="$text.showInfo">&nbsp;</a><%--
+				--%><a class="play" title="$text.startAutoplay">&nbsp;</a><a class="pause" title="$text.stopAutoplay">&nbsp;</a><%--
+				--%><a class="next" href="<ja:if exists="nextPage">${nextPage}</ja:if><ja:else><ja:switch test="${afterLast}">
+					<ja:case value="startover">${firstPage}</ja:case>
+					<ja:case value="onelevelup"><ja:if test="${level}" not value="0">../</ja:if>${parentIndexPage}</ja:case>
+					<ja:case value="backtoindex">${parentIndexPage}</ja:case>
+					<ja:case value="nextfolder"><ja:if exists="nextFoldersFirst">${nextFoldersFirst}</ja:if><ja:else>javascript:void(0)</ja:else></ja:case>
+					<ja:default>javascript:void(0)</ja:default>
+					</ja:switch></ja:else>" title="$text.nextPicture">&nbsp;</a><%--
+			--%></nav>
+		</div>			
+		<div class="img" id="img">
+			<div <ja:if test="${infoPanelVisible}">class="bottom"</ja:if><ja:else>class="bottom hide"</ja:else>>
+				<div class="cont">
+					<ja:if test="${showImageNumbers}"><h4 class="nr"><strong>${imageNum}</strong> / ${totalImages}</h4></ja:if>
+					<ja:if exists="_caption"><div class="caption">${_caption}</div></ja:if>
+					<ja:if test="${facebookCommentsOn}"><div class="panel comments"><div class="icon"></div><div class="fb-comments" id="fb-comments" data-num-posts="${facebookCommentingPosts}" data-colorscheme="${likeBtnTheme}"<ja:if exists="pageUrl"> data-href="${pageUrl}"</ja:if>></div></div></ja:if>
+					<ja:if test="${disqusCommentsOn}"><div class="panel comments"><div class="icon"></div><div class="disqus-comments" id="disqus-comments"><div id="disqus_thread"></div></div></div></ja:if>
+				</div>
+			</div>
+			<div class="main ${_category}" style="width:${_boxWidth}px;height:${_boxHeight}px;"><%--
+			--%><a<ja:if exists="originalPath"> href="${originalPath}"</ja:if><ja:else><ja:if test="${clickForNext}"><ja:if exists="nextPage"> href="${nextPage}"</ja:if></ja:if></ja:else><%--
+				--%><ja:if exists="externalContent"> class="hidden"</ja:if>><%--
+				--%><img <%
+				
+					// Closeup image
+					out.print(util.attr("src", _imagePath));
+				
+					// General data
+					out.print(util.data("modified", _modifiedDays));
+					out.print(util.data("size", _fileSize));
+					
+					// Link to original
+					if (!util.isEmpty(_link)) { 
+						out.print(util.data("link", _link));
+						if ( _original ) 
+							out.print(util.data("isoriginal", "true"));
+					}
+					
+					// Alt tags for SEO
+					if (addAltTags != void && addAltTags)
+						out.print(util.attr("alt", _title));
+							
+					// Map data
+					if (mapOnSlide && _gpsLocation != void && !util.isEmpty(_gpsLocation)) {
+						out.print(util.data("map", util.stripQuot(_gpsLocation)));
+						locationCount++;
+					}
+					
+					// Shop data
+					if (!util.isEmpty(_shop)) {
+						out.print(util.data("shop", (_shop.equals(shopOptionsDefault)? "+" : _shop)));
+						shopCount++;
+					}
+
+					// Type-spcific parameters
+					out.print(util.data("is" + _category.name(), "true"));
+							
+					switch (_category) {
+						case image:
+							
+							out.print(util.data("width", imageWidth));
+							out.print(util.data("height", imageHeight));
+							out.print(util.data("meta", _meta));
+							out.print(util.data("regions", _regions));
+							break;
+						
+						case audio:
+						case video:
+							
+							out.print(util.data("width", _boxWidth));
+							out.print(util.data("height", _boxHeight));
+							out.print(util.data("poster", _imagePath));
+							break;
+						
+						default:
+							
+							if (externalContent != void && !util.isEmpty(externalContent))
+								out.print(util.data("content", externalContent.replaceAll("\"","&#34;")));
+							if (_boxWidth > 0 && _boxHeight > 0) {
+								out.print(util.data("width", _boxWidth));
+								out.print(util.data("height", _boxHeight));
+							}
+					}
+					
+				%>></a>
+				<%
+					if (externalContent != void && !util.isEmpty(externalContent)) {
+						
+						if (externalContent.startsWith("http://") || externalContent.startsWith("https://")) {
+							out.print("<iframe src=\"" + externalContent + "\" width=\"100%\" height=\"100%\" frameborder=\"0\" allowfullscreen=\"allowfullscreen\"></iframe>");
+						} else {
+							out.print(engine.processTemplate(externalContent));
+						}
+						
+					} else if (_category == Category.other) {
+						
+						out.print("<p>$text.clickToOpen</p>");
+						
+					}
+				%>
+			</div>
+		</div>
+		<script>document.getElementById('img').style['display']='none';</script>
+	</div>
+	
+<ja:include page="page-footer.inc" />

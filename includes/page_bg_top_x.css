@@ -1,0 +1,8 @@
+<ja:if not exists="backgroundImage">
+body, .gallery {
+	${bgColor}
+	background-image:url(bg.jpg);
+	background-position:center top;
+	background-repeat:repeat-x;
+}
+</ja:if>

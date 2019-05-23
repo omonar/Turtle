@@ -1,0 +1,29 @@
+<%-- User interface for editing this page from within jAlbum --%>
+<ja:ui>
+	class NewItemsUI extends JWebPageUI {
+		JTextField showAsNewFor = new JTextField(((newDaysCount == void || newDaysCount == null)? "30" : newDaysCount.toString()), 5);
+		JComboBox newPhotosDaysRef = new JComboBox(new Object[] {
+			new Item("dateTaken", texts.getString("ui.dateTaken")),
+			new Item("fileModified", texts.getString("ui.fileModified")),
+			new Item("added", texts.getString("ui.addedToAlbum"))
+		});
+		{
+			add(new JLabel("Gather images modified in the past"));
+			add(showAsNewFor);
+			add(new JLabel("days."));
+			add(new JLabel(texts.getString("ui.reference")));
+			add(newPhotosDaysRef);
+			
+			putClientProperty("helpPage", "https://lazaworx.com/static/help/ui/newphotos-page.html");
+		}
+	}
+</ja:ui>
+<ja:include page="page-header.inc" /> <%-- Keep this --%>
+				</article>
+				
+				<ja:include page="templates/NewPhotos-images.inc" /> <%-- Keep this --%>
+				
+				<ja:if exists="caption"><article><p>${caption}</p></ja:if>
+				<ja:else><article class="hidden"></ja:else>
+
+<ja:include page="page-footer.inc" /> <%-- Keep this --%>

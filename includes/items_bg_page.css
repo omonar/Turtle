@@ -1,0 +1,50 @@
+.rgba .thumbs td,
+.rgba .folders td,
+.no-rgba .thumbs td,
+.no-rgba .folders td,
+.rgba .neighbors a,
+.no-rgba .neighbors a,
+#map,
+.disqus-comments,
+#main article {
+	background-color:transparent;
+	background-image:url(bg1.jpg);
+	background-position:center center;
+}
+.folders h4 {
+	${tb_l}
+}
+.rgba .thumbs td.empty,
+.rgba .folders td.empty,
+.no-rgba .thumbs td.empty,
+.no-rgba .folders td.empty {
+	background-image:none;
+}
+.folders a:hover,
+.folders a:focus,
+.thumbs td > a:hover,
+.thumbs td > a:focus,
+.neighbors a:hover,
+.neighbors a:focus {
+	text-decoration:underline;
+	padding:
+} 
+.folders aside a:hover img,
+.folders aside a:focus img,
+.thumbs td > a:hover img,
+.thumbs td > a:focus img {
+	outline:2px solid ${hoverColor};
+}
+.folders aside a.active img,
+.folders aside a.active img,
+.thumbs td > a.active img,
+.thumbs td > a.active img {
+	outline:2px solid ${linkColor};
+}
+.thumbs td > a.active {
+	background-color:rgba(255,255,255,0.8);
+}
+.no-rgba .thumbs td > a.active {
+	background-color:transparent;
+	background-image:url(w80.png);
+}

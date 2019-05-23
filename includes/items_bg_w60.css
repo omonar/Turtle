@@ -1,0 +1,63 @@
+.rgba .thumbs td,
+.rgba .folders td,
+.rgba .neighbors a,
+#map,
+.disqus-comments {
+	background-color:rgba(255,255,255,0.6);
+	color:#222;
+	${tb_l}
+}
+.no-rgba .thumbs td,
+.no-rgba .folders td,
+.no-rgba .neighbors a,
+.no-rgba #map,
+.no-rgba .disqus-comments {
+	background-color:transparent;
+	background-image:url(w60.png);
+}
+.rgba .thumbs td > a:hover,
+.rgba .thumbs td > a:focus,
+.neighbors a:hover,
+.neighbors a:focus,
+.folders td:hover {
+	background-color:rgba(255,255,255,0.8);
+	outline:none;
+	color:#000;
+}
+.folders td > a {
+	color:#222;
+}
+.folders td:hover > a {
+	color:#000;
+}
+.no-rgba .thumbs td > a:hover,
+.no-rgba .thumbs td > a:focus,
+.no-rgba .neighbors a:hover,
+.no-rgba .neighbors a:focus,
+.no-rgba .folders td:hover {
+	background-color:transparent;
+	background-image:url(w80.png);
+}
+.rgba .thumbs td > a.active,
+.no-rgba .thumbs td > a.active {
+	background-color:#fff;
+}
+#main article {
+	background-color:rgba(255,255,255,0.8);
+}
+.no-rgba #main article {
+	background-color:transparent;
+	background-image:url(w80.png);
+}
+.folders h4 {
+	text-shadow:none;
+}
+.thumbs td > .caption span.nr {
+	font-weight:bold;
+	font-style:normal;
+	padding:0px 3px;
+	color:#222;
+	background-color:#fff;
+	text-shadow:none;
+}
+

@@ -1,0 +1,8 @@
+/*
+	postdir.bsh - the Beanshell script that runs after each directory has made
+	Author: Laza
+*/
+	
+	if (searchOn != void && searchOn) {
+		util.stopPageSearch();
+	}

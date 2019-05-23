@@ -1,0 +1,22 @@
+<ja:if not exists="backgroundImage">
+#mainbg, .gallery {
+	${bgColor} 
+	background-image:url(bg.jpg);
+	background-position:center top;
+	background-repeat:repeat-x;
+	-moz-background-size:auto 100%;
+	background-size:auto 100%;
+}
+#widgetbg {
+	${bgColor}
+	background-image:url(bg.jpg);
+	background-position:center top;
+	background-repeat:repeat-x;
+}
+.no-backgroundsize #widgetbg, .no-backgroundsize #mainbg, .no-backgroundsize .gallery {
+	background-repeat:repeat;
+}
+</ja:if>
+
+<ja:include page="includes/items_bg_k60.css" />
+

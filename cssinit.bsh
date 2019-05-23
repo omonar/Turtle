@@ -1,0 +1,283 @@
+<%	/*	cssinit.bsh
+		
+		specific variables for the CSS files 
+		to avoid too many beanshell calls
+		that used to cause memory leak
+	*/
+	
+	/* -------------------------------------------------------
+		Globals
+	*/
+		
+	boolean splashVertical = themeImageLeft || (folderImageWidth <= folderImageHeight);
+	
+	int bottom = hasWidgets? 25 : 0,
+		// scrol bar width ( = 0 if scrolling the whole page )
+		scrollBarWidth = smartScroll? 20 : 0,
+		// height of top navigation
+		topnavHeight = showTopNavigation? 30 : 0,
+		navLineHeight = (logo == void || util.isEmpty(logo))? 30 : 40,
+		// gap between the items and the header
+		gutter = 20,
+		// vertical gap between the header and the items
+		verticalGap = 30 - thumbGap,
+		// gallery width
+		galleryWidth = splashVertical?
+			(int)Math.round((float)folderImageWidth * 1.5) : folderImageWidth,
+		// Width for the <table> element
+		tableWidth = galleryWidth + 2 * thumbGap,
+		containerWidth,
+		headerHeight, 
+		folderImageHeightPage,
+		headerHeightPage, 
+		folderImageHeightSubAlbum,
+		headerHeightSubAlbum, 
+		headerMinHeight,
+		descriptionWidth = folderImageWidth - 120 - (showStartSlideshow? 100 : 0),
+		descriptionPad = descriptionVisible? 40 : 100,
+		descriptionHeight,
+		descriptionHeightPage, 
+		descriptionHeightSubAlbum,
+		itemsMinHeight,
+		itemsFullWidth,
+		itemsTop,
+		itemsTopPage,
+		itemsTopSubAlbum,
+		itemsLeft,
+		leftBoxWidth, leftBoxTop, leftBoxTopPage, leftBoxTopSubAlbum;
+		
+	if (splashVertical) {
+		
+		containerWidth = folderImageWidth + verticalGap + tableWidth + scrollBarWidth;
+		headerHeight = folderImageHeight;
+		headerMinHeight = 200;
+		folderImageHeightPage = headerHeightPage = (folderImageHeightPages == void || util.isEmpty(folderImageHeightPages))? 
+			folderImageHeight :	Math.min( folderImageHeight, Math.max(headerMinHeight, folderImageHeightPages) );
+		folderImageHeightSubAlbum = headerHeightSubAlbum = (folderImageHeightSubAlbums == void || util.isEmpty(folderImageHeightSubAlbums))? 
+			folderImageHeight :	Math.max(headerMinHeight, folderImageHeightSubAlbums);
+		descriptionHeight = Math.max(folderImageHeight - descriptionPad, 30);
+		descriptionHeightPage = Math.max(headerHeightPage - descriptionPad, 30);
+		descriptionHeightSubAlbum = Math.max(headerHeightSubAlbum - descriptionPad, 30);
+		itemsFullWidth = tableWidth + scrollBarWidth;
+		itemsLeft = folderImageWidth + verticalGap;
+		itemsTop = topnavHeight + gutter;
+		leftBoxWidth = folderImageWidth;
+		leftBoxTop = folderImageHeight + gutter;
+		leftBoxTopPage = headerHeightPage + gutter;
+		leftBoxTopSubAlbum = headerHeightSubAlbum + gutter;
+
+	} else {
+		
+		containerWidth = folderImageWidth + (2 * (smartScroll? scrollBarWidth : thumbGap));
+		headerHeight = folderImageHeight - topnavHeight;
+		headerMinHeight = showStartSlideshow? 120 : 80;
+		folderImageHeightPage = (folderImageHeightPages == void || util.isEmpty(folderImageHeightPages))? 
+			folderImageHeight :	Math.min( folderImageHeight, Math.max(headerMinHeight, folderImageHeightPages) + topnavHeight );
+		headerHeightPage = folderImageHeightPage - topnavHeight;
+		folderImageHeightSubAlbum = (folderImageHeightSubAlbums == void || util.isEmpty(folderImageHeightSubAlbums))? 
+			folderImageHeight :	Math.max(headerMinHeight, folderImageHeightSubAlbums);
+		headerHeightSubAlbum = folderImageHeightSubAlbum - topnavHeight;
+		descriptionHeight = Math.max(folderImageHeight - descriptionPad, 30);
+		descriptionHeightPage = Math.max(headerHeightPage - descriptionPad, 30);
+		descriptionHeightSubAlbum = Math.max(headerHeightSubAlbum - descriptionPad, 30);
+		itemsMinHeight = Math.min(maxThumbHeight * 2, 200);
+		itemsFullWidth = tableWidth + scrollBarWidth;
+		itemsTop = folderImageHeight + gutter;
+		itemsTopPage = folderImageHeightPage + gutter;
+		itemsTopSubAlbum = folderImageHeightSubAlbum + gutter;
+		itemsLeft = scrollBarWidth - thumbGap;
+		
+	}
+	
+		
+		
+	/* -------------------------------------------------------
+		Image thumbnails
+	*/
+	
+	int	thumbCols = Math.max(1, Math.floor((float)(galleryWidth + thumbGap) / (maxThumbWidth + 2 * minThumbPad + thumbGap))),
+		thumbPad = Math.floor( ((float)(galleryWidth + 2 - (thumbCols - 1) * thumbGap - thumbCols * maxThumbWidth) / thumbCols) / 2 ),
+		thumbCellWidth = maxThumbWidth + 2 * thumbPad,
+		thumbCellHeight = maxThumbHeight + 2 * thumbPad,
+		thumbLineHeight = maxThumbHeight - 4;
+		
+		//System.out.println("("+galleryWidth+" - ("+thumbCols+" - 1) * "+thumbGap+" - "+thumbCols+" * "+maxThumbWidth+") / "+thumbCols+") / 2 = " + thumbPad);
+		
+	int thumbPad2 = thumbPad + 2,
+		borderWidth2 = borderWidth + 2;
+	
+		//int thumbsLeft = Math.floor((galleryWidth % (fullThumbWidth + 2 * thumbGap)) / 2);
+	int neighborLinkWidth = Math.floor((galleryWidth - thumbGap) / 2) - 2 * thumbPad;
+	
+	/* -------------------------------------------------------
+		Folder thumbnails
+	*/
+	
+	int minFolderPad = Math.max(Math.round(minThumbPad * 1.5), thumbPad),
+		folderPad,
+		maxFolderWidth = Math.floor( (float)(galleryWidth + thumbGap) / folderCols ) - thumbGap - 2 * minFolderPad,
+		maxFolderThumbWidth,
+		maxFolderThumbHeight;
+	
+	if (maxFolderWidth < maxThumbWidth) { 
+		// Smaller space left than the generated thumbs
+		maxFolderThumbWidth = maxFolderWidth;
+		maxFolderThumbHeight = Math.round(maxThumbHeight * maxFolderThumbWidth / maxThumbWidth);
+	} else {
+		maxFolderThumbWidth = maxThumbWidth;
+		maxFolderThumbHeight = maxThumbHeight;
+	}		
+	// Vertical folder thumb layout if less that 100px space left on the side
+	boolean folderVertical = (maxFolderWidth - maxFolderThumbWidth) < 90;
+	// Make the top padding equal to the sides
+	int folderPad = minFolderPad + (folderVertical? Math.floor((maxFolderWidth - maxFolderThumbWidth) / 2) : 0),
+		folderCellWidth = Math.floor((float)(galleryWidth - (folderCols - 1) * thumbGap) / folderCols);
+	
+	/* -------------------------------------------------------
+		Scroll box above images
+	*/
+
+	int scrollCellPad = 3,
+		scrollCellGap = 1,
+		scrollWrapHeight = reducedThumbHeight + 2 * (scrollCellPad + scrollCellGap),
+		scrollCellWidth = reducedThumbWidth + 2 * scrollCellPad,
+		scrollCellHeight = reducedThumbHeight + 2 * scrollCellPad,
+		thumbScrollerHeight = reducedThumbHeight + 20,
+		thumbScrollerWidth = Math.max(maxImageWidth, containerWidth) - 40;
+	
+	int smallThumbWidth = Math.floor(maxThumbWidth / 3.3333),
+		smallThumbHeight = Math.floor(maxThumbHeight / 3.3333);
+		
+	/* -------------------------------------------------------
+		Image page variables
+	*/
+	
+	String imageBorder = (borderWidth > 0)? (borderWidth + "px solid " + borderColor) : "none";
+	int otherWidth = maxThumbWidth * 2,
+		captionWidth = thumbScrollerWidth - 30,
+		mapWidth = captionWidth - 30;
+
+	/* -------------------------------------------------------
+		3D effect styles
+	*/
+	
+	String bs_sd, bs_md, bs_ld, bs_xd, bs_sm, bs_mm, bs_lm, bs_xm, bs_sl, bs_ml, bs_ll, bs_xl,
+		bis_sm, bis_ml, ts_md, ts_sd, tb_l, tb_s, tb_d;
+	
+	if ( use3dEffects ) {
+		
+		// Box drop shadow
+		bs_sd = "-moz-box-shadow:0px 1px 2px rgba(0,0,0,0.6); -webkit-box-shadow:0px 1px 2px rgba(0,0,0,0.6); box-shadow:0px 1px 2px rgba(0,0,0,0.6);";
+		bs_md = "-moz-box-shadow:1px 3px 8px rgba(0,0,0,0.6); -webkit-box-shadow:1px 3px 8px rgba(0,0,0,0.6); box-shadow:1px 3px 8px rgba(0,0,0,0.6);";
+		bs_ld = "-moz-box-shadow:2px 5px 16px rgba(0,0,0,0.6); -webkit-box-shadow:2px 5px 16px rgba(0,0,0,0.6); box-shadow:2px 5px 16px rgba(0,0,0,0.6);";
+		bs_xd = "-moz-box-shadow:3px 6px 32px rgba(0,0,0,0.6); -webkit-box-shadow:3px 6px 32px rgba(0,0,0,0.6); box-shadow:3px 6px 32px rgba(0,0,0,0.6);";
+		bs_sm = "-moz-box-shadow:0px 1px 2px rgba(0,0,0,0.4); -webkit-box-shadow:0px 1px 2px rgba(0,0,0,0.4); box-shadow:0px 1px 2px rgba(0,0,0,0.4);";
+		bs_mm = "-moz-box-shadow:1px 3px 8px rgba(0,0,0,0.4); -webkit-box-shadow:1px 3px 8px rgba(0,0,0,0.4); box-shadow:1px 3px 8px rgba(0,0,0,0.4);";
+		bs_lm = "-moz-box-shadow:2px 5px 16px rgba(0,0,0,0.4); -webkit-box-shadow:2px 5px 16px rgba(0,0,0,0.4); box-shadow:2px 5px 16px rgba(0,0,0,0.4);";
+		bs_xm = "-moz-box-shadow:3px 6px 32px rgba(0,0,0,0.4); -webkit-box-shadow:3px 6px 32px rgba(0,0,0,0.4); box-shadow:3px 6px 32px rgba(0,0,0,0.4);";
+		bs_sl = "-moz-box-shadow:0px 1px 2px rgba(0,0,0,0.2); -webkit-box-shadow:0px 1px 2px rgba(0,0,0,0.2); box-shadow:0px 1px 2px rgba(0,0,0,0.2);";
+		bs_ml = "-moz-box-shadow:1px 3px 8px rgba(0,0,0,0.2); -webkit-box-shadow:1px 3px 8px rgba(0,0,0,0.2); box-shadow:1px 3px 8px rgba(0,0,0,0.2);";
+		bs_ll = "-moz-box-shadow:2px 5px 16px rgba(0,0,0,0.2); -webkit-box-shadow:2px 5px 16px rgba(0,0,0,0.2); box-shadow:2px 5px 16px rgba(0,0,0,0.2);";
+		bs_xl = "-moz-box-shadow:3px 6px 32px rgba(0,0,0,0.2); -webkit-box-shadow:3px 6px 32px rgba(0,0,0,0.2); box-shadow:3px 6px 32px rgba(0,0,0,0.2);";
+		
+		// Box inner shadow
+		bis_sl = "-moz-box-shadow:inset 0px 1px 3px rgba(0,0,0,0.2); -webkit-box-shadow:inset 0px 1px 3px rgba(0,0,0,0.2); box-shadow:inset 0px 1px 3px rgba(0,0,0,0.2);";
+		bis_sm = "-moz-box-shadow:inset 0px 2px 4px rgba(0,0,0,0.4); -webkit-box-shadow:inset 0px 2px 4px rgba(0,0,0,0.4); box-shadow:inset 0px 2px 4px rgba(0,0,0,0.4);";
+		bis_ml = "-moz-box-shadow:inset 0px 4px 10px rgba(0,0,0,0.4); -webkit-box-shadow:inset 0px 4px 10px rgba(0,0,0,0.4); box-shadow:inset 0px 4px 10px rgba(0,0,0,0.4);";
+		
+		// Text shadow
+		ts_md = "text-shadow:2px 3px 6px rgba(0,0,0,0.5);";
+		ts_sd = "text-shadow:1px 2px 4px rgba(0,0,0,0.5);";
+		ts_sm = "text-shadow:1px 1px 2px rgba(0,0,0,0.4);";
+		
+		// Text bevel
+		tb_l = "text-shadow:1px 1px 1px rgba(255,255,255,0.3);";
+		tb_s = "text-shadow:1px 1px 1px rgba(255,255,255,0.6);";
+		tb_d = "text-shadow:-1px -1px 1px rgba(0,0,0,0.6);";
+		
+	} else {
+		
+		// No 3D effects
+		bs_sd = bs_md = bs_ld = bs_xd = bs_sm = bs_mm = bs_lm = bs_xm = bs_sl = bs_ml = bs_ll = bs_xl = bis_sm = bis_ml = ts_md = ts_sd = tb_l = tb_s = tb_d = "";
+	}
+	
+	/* -------------------------------------------------------
+		Border radius
+	*/
+	
+	int crs = Math.round((float)cornerRadius * 0.3),
+		crm = Math.round((float)cornerRadius * 0.6),
+		crl = cornerRadius;
+		
+	String s, 
+		cr_s, cr_st, cr_sb, cr_sl, cr_sr, 
+		cr_m, cr_mt, cr_mb, cr_ml, cr_mr,
+		cr_l, cr_lt, cr_lb;
+	
+	if ( crs > 1 ) {
+		s = crs.toString();
+		cr_s = "-moz-border-radius:"+s+"px; border-radius:"+s+"px;"; 
+		cr_st = "-moz-border-top-left-radius:"+s+"px; -moz-border-top-right-radius:"+s+"px; border-top-left-radius:"+s+"px; border-top-right-radius:"+s+"px;"; 
+		cr_sb = "-moz-border-bottom-left-radius:"+s+"px; -moz-border-bottom-right-radius:"+s+"px; border-bottom-left-radius:"+s+"px; border-bottom-right-radius:"+s+"px;"; 
+		cr_sl = "-moz-border-top-left-radius:"+s+"px; -moz-border-bottom-left-radius:"+s+"px; border-top-left-radius:"+s+"px; border-bottom-left-radius:"+s+"px;"; 
+		cr_sr = "-moz-border-top-right-radius:"+s+"px; -moz-border-bottom-right-radius:"+s+"px; border-top-right-radius:"+s+"px; border-bottom-right-radius:"+s+"px;"; 
+	} else {
+		cr_s = cr_st = cr_sb = cr_sl = cr_sr = "";
+	}
+	
+	if ( crm > 1 ) {
+		s = crm.toString();
+		cr_m = "-moz-border-radius:"+s+"px; border-radius:"+s+"px;"; 
+		cr_mt = "-moz-border-top-left-radius:"+s+"px; -moz-border-top-right-radius:"+s+"px; border-top-left-radius:"+s+"px; border-top-right-radius:"+s+"px;"; 
+		cr_mb = "-moz-border-bottom-left-radius:"+s+"px; -moz-border-bottom-right-radius:"+s+"px; border-bottom-left-radius:"+s+"px; border-bottom-right-radius:"+s+"px;"; 
+		cr_ml = "-moz-border-top-left-radius:"+s+"px; -moz-border-bottom-left-radius:"+s+"px; border-top-left-radius:"+s+"px; border-bottom-left-radius:"+s+"px;"; 
+		cr_mr = "-moz-border-top-right-radius:"+s+"px; -moz-border-bottom-right-radius:"+s+"px; border-top-right-radius:"+s+"px; border-bottom-right-radius:"+s+"px;"; 
+	} else {
+		cr_m = cr_mt = cr_mb = cr_ml = cr_mr = "";
+	}
+
+	if ( crl > 1 ) {
+		s = crl.toString();
+		cr_l = "-moz-border-radius:"+s+"px; border-radius:"+s+"px;"; 
+		cr_lt = "-moz-border-top-left-radius:"+s+"px; -moz-border-top-right-radius:"+s+"px; border-top-left-radius:"+s+"px; border-top-right-radius:"+s+"px;"; 
+		cr_lb = "-moz-border-bottom-left-radius:"+s+"px; -moz-border-bottom-right-radius:"+s+"px; border-bottom-left-radius:"+s+"px; border-bottom-right-radius:"+s+"px;"; 
+	} else {
+		cr_l = cr_lt = cr_lb = "";
+	}
+	
+	
+	String cr_img = "", cr_imgc = "";
+	
+	if (imgCornerRadius != void && imgCornerRadius != null && imgCornerRadius > 0) {
+		cr_img = "-moz-border-radius:"+imgCornerRadius+"px; border-radius:"+imgCornerRadius+"px;"; 
+		cr_imgc = "-moz-border-radius:"+(imgCornerRadius+borderWidth)+"px; border-radius:"+(imgCornerRadius + Math.round(borderWidth*0.667))+"px;";
+	}
+			
+	/* -------------------------------------------------------
+		Miscellaneous
+	*/
+	
+	// Background image
+	String backgroundImage = ( backgroundImageName != void && backgroundImageName.length() > 0 )? util.urlEncode(backgroundImageName) : "";
+	
+	String bgColor = util.getBgColor(backgroundColor);  
+	String borColor = util.getBgColor((borderWidth == 0)? backgroundColor : borderColor);
+	String hdColor = util.getBgColor(headerColor);
+	
+	boolean modalLight = modalWindowsTheme == void || modalWindowsTheme.equals("light") || (modalWindowsTheme.equals("auto") && lightStyle);
+	
+	// Headline font
+	String headlineName = "";
+	String headlinePath = "";
+	if (headlineFamily != void && !util.isEmpty(headlineFamily)) {
+		if (headlineFamily.indexOf("::") > 0) {
+			headlineName = headlineFamily.split("::")[0];
+			headlinePath = headlineFamily.split("::")[1];
+		} else {
+			headlinePath = headlineFamily;
+		}
+	}
+	
+	int videoControlHeight = 36;
+
+%>

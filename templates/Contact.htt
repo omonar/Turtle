@@ -1,0 +1,201 @@
+<ja:include page="page-header.inc" /> <%-- Keep this --%>
+
+<ja:ui>
+	class ContactUI extends JWebPageUI {
+		import javax.swing.filechooser.*;
+		import se.datadosen.jalbum.AlbumImage;
+		import se.datadosen.jalbum.AlbumObjectFactory;
+		import se.datadosen.jalbum.AlbumObjectMetadata;
+		
+		JTextField email_address = new JTextField(20);
+		JTextField map_location = new JTextField(20);
+		JSlider map_zoom = new JSlider(JSlider.HORIZONTAL, 1, 20, 18);
+		JButton selectImage = new JButton("Read from a photo");
+		JFileChooser fc = new JFileChooser();
+		fc.setFileFilter(new FileNameExtensionFilter("Images", new String[] {"jpg", "jpeg"}));
+		fc.setDialogTitle("Point to a photo with GPS data");
+		JTextArea postal_address = new JSmartTextArea(4,20);
+		JTextField phone_number = new JTextField(16);
+		JTextField skype_id = new JTextField(16);
+		JTextField facebook_id = new JTextField(16);
+		JTextField twitter_id = new JTextField(16);
+		JTextField pinterest_id = new JTextField(16);
+		JTextField tumblr_id = new JTextField(16);
+		JTextField jalbum_id = new JTextField(16);
+		JTextField flickr_id = new JTextField(16);
+		JTextField foursquare_id = new JTextField(16);
+		JTextField google_id = new JTextField(16);
+		JTextField linkedin_id = new JTextField(16);
+		JTextField vimeo_id = new JTextField(16);
+		JTextField youtube_id = new JTextField(16);
+		JTextField instagram_id = new JTextField(16);
+		JTextField custom_link1 = new JTextField(16);
+		JTextField custom_linktext1 = new JTextField(16);
+		JTextField custom_link2 = new JTextField(16);
+		JTextField custom_linktext2 = new JTextField(16);
+		JTextField custom_link3 = new JTextField(16);
+		JTextField custom_linktext3 = new JTextField(16);
+		
+		File getFile() {
+			int returnVal = fc.showOpenDialog(window);
+			return (returnVal == JFileChooser.APPROVE_OPTION)? fc.getSelectedFile() : null;
+		}
+		
+		{
+			selectImage.addActionListener(new ActionListener() { 
+				public void actionPerformed(ActionEvent e) {
+					File src = getFile();
+					if (src.exists()) {
+						AlbumObject ao = rootFolder.getFactory().createInstance(src, rootFolder);
+						Map vars = ao.getVars();
+						String nl = vars.get("gpsLocation");
+						if (nl != null) {
+							map_location.setText(nl);
+						} else {
+							JOptionPane.showMessageDialog(
+								window, 
+								"No GPS coordinate was found in image " + src.toString(),
+								"Warning", 
+								JOptionPane.WARNING_MESSAGE
+							);
+						}
+					}
+				}
+			});
+			
+			map_zoom.setOrientation(JSlider.HORIZONTAL);
+			map_zoom.setMinimum(0);
+			map_zoom.setMaximum(20);
+			map_zoom.setValue(16);
+			map_zoom.setMajorTickSpacing(10);
+			map_zoom.setMinorTickSpacing(1);
+			map_zoom.setPaintTicks(true);
+			map_zoom.setPaintLabels(true);
+			map_zoom.setSnapToTicks(true);
+			
+			add(new JLabel("Email", ShareIcons.email, SwingConstants.LEADING));
+			add("tab", email_address);
+			
+			add("br", new JLabel("Map location"));
+			add("tab hfill", map_location);
+			add(selectImage);
+			
+			add("br", new JLabel("Map zoom"));
+			add("tab", map_zoom);
+
+			postal_address.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, null); // Use default mapping
+			postal_address.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, null); // Use default mapping			
+			postal_address.setLineWrap(true);
+			postal_address.setFont(new Font("monospaced", Font.PLAIN, 12));
+			add("br", new JLabel("Postal address", SwingConstants.LEADING));
+			add("tab", new JScrollPane(postal_address));
+
+			add("br", new JLabel("Phone number", ShareIcons.phone, SwingConstants.LEADING));
+			add("tab", phone_number);
+
+			add("br", new JLabel("Custom link 1"));
+			add("tab", custom_link1);
+			add("tab", new JLabel("Text"));
+			add("tab", custom_linktext1);
+			
+			add("br", new JLabel("Custom link 2"));
+			add("tab", custom_link2);
+			add("tab", new JLabel("Text"));
+			add("tab", custom_linktext2);
+			
+			add("br", new JLabel("Custom link 3"));
+			add("tab", custom_link3);
+			add("tab", new JLabel("Text"));
+			add("tab", custom_linktext3);
+			
+			add("br", new JLabel("Skype id", ShareIcons.skype, SwingConstants.LEADING));
+			add("tab", skype_id);
+			
+			add("tab", new JLabel("Facebook id", ShareIcons.facebook, SwingConstants.LEADING));
+			add("tab", facebook_id);
+
+			add("br", new JLabel("Twitter id", ShareIcons.twitter, SwingConstants.LEADING));
+			add("tab", twitter_id);
+
+			add("tab", new JLabel("Pinterest id", ShareIcons.pinterest, SwingConstants.LEADING));
+			add("tab", pinterest_id);
+
+			add("br", new JLabel("Tumblr id", ShareIcons.tumblr, SwingConstants.LEADING));
+			add("tab", tumblr_id);
+
+			add("tab", new JLabel("jAlbum id", ShareIcons.jalbum, SwingConstants.LEADING));
+			add("tab", jalbum_id);
+
+			add("br", new JLabel("Flickr id", ShareIcons.flickr, SwingConstants.LEADING));
+			add("tab", flickr_id);
+
+			add("tab", new JLabel("Foursquare id", ShareIcons.foursquare, SwingConstants.LEADING));
+			add("tab", foursquare_id);
+
+			add("br", new JLabel("Google+ id", ShareIcons.googleplus, SwingConstants.LEADING));
+			add("tab", google_id);
+
+			add("tab", new JLabel("LinkedIn id", ShareIcons.linkedin, SwingConstants.LEADING));
+			add("tab", linkedin_id);
+
+			add("br", new JLabel("Vimeo id", ShareIcons.vimeo, SwingConstants.LEADING));
+			add("tab", vimeo_id);
+
+			add("tab", new JLabel("YouTube id", ShareIcons.youtube, SwingConstants.LEADING));
+			add("tab", youtube_id);
+			
+			add("br", new JLabel("Instagram id", ShareIcons.instagram, SwingConstants.LEADING));
+			add("tab", instagram_id);
+
+			putClientProperty("helpPage", "https://lazaworx.com/static/help/ui/contact-page.html");
+		}
+	}
+</ja:ui>
+
+
+	<div id="contact-page" class="clearfix">
+		<aside><img src="${resPath}/contact.png"></aside>
+		<div class="texts">
+			<ja:if exists="caption"><p>${caption}</p></ja:if>
+			<ja:if exists="email_address"><div class="email">Contact me in email: <a href="mailto:${email_address}">${email_address}</a></div></ja:if>
+			<ja:if exists="map_location"><div id="map_canvas" class="map" style="height:240px;"></div></ja:if>
+			<ja:if exists="postal_address"><div class="address">Postal address:<blockquote><%= postal_address.replaceAll("\n", "<br/>") %></blockquote></div></ja:if>
+			<ja:if exists="phone_number"><div class="phone">Phone number: <a href="callto://${phone_number}">${phone_number}</a></div></ja:if>
+			<ja:if test="<%= (custom_link1 != void && custom_link1 != null) || (custom_link2 != void && custom_link2 != null) || (custom_link3 != void && custom_link3 != null) %>"><div class="custom">
+			<ja:if exists="custom_link1"><a href="${custom_link1}" target="_blank">${custom_linktext1}</a></ja:if>
+			<ja:if exists="custom_link2"><a href="${custom_link2}" target="_blank">${custom_linktext2}</a></ja:if>
+			<ja:if exists="custom_link3"><a href="${custom_link3}" target="_blank">${custom_linktext3}</a></ja:if>
+			</div></ja:if>
+			<ja:if exists="skype_id"><div class="skype">Skype: <a href="skype:${skype_id}?call">${skype_id}</a></div></ja:if>
+			<ja:if exists="facebook_id"><div class="facebook"><strong>Facebook</strong>: <a href="https://www.facebook.com/${facebook_id}" target="_blank">https://www.facebook.com/${facebook_id}</a></div></ja:if>
+			<ja:if exists="twitter_id"><div class="twitter"><strong>Twitter</strong>: <a href="https://twitter.com/#!/${twitter_id}" target="_blank">https://twitter.com/${twitter_id}</a></div></ja:if>
+			<ja:if exists="pinterest_id"><div class="pinterest"><strong>Pinterest</strong>: <a href="https://pinterest.com/${pinterest_id}" target="_blank">https://pinterest.com/${pinterest_id}</a></div></ja:if>
+			<ja:if exists="tumblr_id"><div class="tumblr"><strong>Tumblr feed</strong>: <a href="https://${tumblr_id}.tumblr.com/" target="_blank">https://${tumblr_id}.tumblr.com/</a></div></ja:if>
+			<ja:if exists="jalbum_id"><div class="jalbum"><strong>jAlbum</strong>: <a href="https://${jalbum_id}.jalbum.net/" target="_blank">https://${jalbum_id}.jalbum.net/</a></div></ja:if>
+			<ja:if exists="flickr_id"><div class="flickr"><strong>flickr</strong>: <a href="https://www.flickr.com/photos/${flickr_id}/" target="_blank">https://www.flickr.com/photos/${flickr_id}/</a></div></ja:if>
+			<ja:if exists="foursquare_id"><div class="foursquare"><strong>Foursquare</strong>: <a href="https://foursquare.com/${foursquare_id}" target="_blank">https://foursquare.com/${foursquare_id}</a></div></ja:if>
+			<ja:if exists="google_id"><div class="google"><strong>Google +</strong>: <a href="https://plus.google.com/u/0/${google_id}/posts" target="_blank">https://plus.google.com/u/0/${google_id}/posts</a></div></ja:if>
+			<ja:if exists="linkedin_id"><div class="linkedin"><strong>LinkedIn</strong>: <a href="https://www.linkedin.com/profile/view?id=${linkedin_id}" target="_blank">https://www.linkedin.com/profile/view?id=${linkedin_id}</a></div></ja:if>
+			<ja:if exists="vimeo_id"><div class="vimeo"><strong>Vimeo</strong>: <a href="https://vimeo.com/${vimeo_id}" target="_blank">https://vimeo.com/${vimeo_id}</a></div></ja:if>
+			<ja:if exists="youtube_id"><div class="youtube"><strong>YouTube</strong>: <a href="https://www.youtube.com/user/${youtube_id}" target="_blank">https://www.youtube.com/user/${youtube_id}</a></div></ja:if>
+			<ja:if exists="instagram_id"><div class="instagram"><strong>Instagram</strong>: <a href="https://instagram.com/${instagram_id}" target="_blank">https://instagram.com/${instagram_id}</a></div></ja:if>
+		</div>
+	</div>
+	
+	<ja:if exists="map_location">
+	<script src="https://maps.google.com/maps/api/js?<ja:if exists="googleApiKey">key=${googleApiKey}</ja:if>"></script>
+	<script>
+		function init_map() {
+			var pos = new google.maps.LatLng(${map_location}),
+				map = new google.maps.Map( document.getElementById('map_canvas'), {
+					center: pos, zoom: ${map_zoom}, mapTypeId: google.maps.MapTypeId.ROADMAP
+				});
+				marker = new google.maps.Marker({
+					position: pos, map: map <ja:if exists="postal_address">, title: '<%= postal_address.replaceAll("\n", " :: ").replaceAll("\'", "\\\\\'") %>'</ja:if>
+				});
+		}
+		google.maps.event.addDomListener(window, 'load', init_map);
+	</script>
+	</ja:if>
+
+<ja:include page="page-footer.inc" /> <%-- Keep this --%>

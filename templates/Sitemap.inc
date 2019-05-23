@@ -1,0 +1,1 @@
+<%= util.getSitemap(currentFolder, "", showSitemapDescriptions, showSitemapThumbs); %>

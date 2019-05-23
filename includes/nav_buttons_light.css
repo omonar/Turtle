@@ -1,0 +1,33 @@
+nav.buttons {
+	border:1px solid #ccc;
+	color:#222;
+	background-color:#aaa;
+	background-image:-webkit-gradient(linear, left top, left bottom, color-stop(0, rgba(255,255,255,1)), color-stop(1, rgba(238,238,238,1)));
+	background-image:-webkit-linear-gradient(top, rgba(255,255,255,1), rgba(238,238,238,1) );
+	background-image:-moz-linear-gradient(top, rgba(255,255,255,1), rgba(238,238,238,1) );
+	background-image:-ms-linear-gradient(top, rgba(255,255,255,1), rgba(238,238,238,1) );
+	background-image:linear-gradient(top, rgba(255,255,255,1), rgba(238,238,238,1) );
+	filter:progid:DXImageTransform.Microsoft.Gradient(StartColorStr=#FFFFFFFF,EndColorStr=#FFDDDDDD);
+	${bs_sl}
+}
+nav.buttons a {
+	color:#444;
+	border-left:1px solid #ccc;
+	background-image:url(buttons_w.png);
+}
+nav.buttons a:hover {
+	color:#222;
+}
+nav.buttons a.active {
+	color:#222;
+	background-color:rgba(0,0,0,0.2);
+	border-left-color:#aaa;
+}
+.no-rgba nav.buttons a.active {
+	background-color:#aaa;
+}
+.gallery .bottom .icon {
+	background-image:url(buttons_w.png);
+}
+
+

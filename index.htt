@@ -1,0 +1,20 @@
+<ja:include page="page-header.inc" />
+
+<ja:if exists="itemsOrder">
+<ja:include page="${item0}.inc" />
+<ja:if exists="item1"><ja:include page="${item1}.inc" /></ja:if>
+<ja:if exists="item2"><ja:include page="${item2}.inc" /></ja:if>
+</ja:if><ja:else>
+<ja:include page="folders.inc" />
+<ja:include page="pages.inc" />
+<ja:include page="images.inc" />
+</ja:else>
+<ja:if test="<%= !(linkNeighboringFolders == void || !linkNeighboringFolders || (util.isEmpty(nextFolderPath) && util.isEmpty(previousFolderPath))) %>">
+				<div class="neighbors clearfix">
+					<ja:if exists="nextFolderPath"><a href="${nextFolderPath}" class="next"><ja:if exists="nextFolderThumbPath"><img src="${nextFolderThumbPath}"<ja:if test="${addAltTags}"> alt="${nextFolderTitle}"</ja:if>></ja:if><span>${text.next}: <strong>${nextFolderTitle}</strong></span></a></ja:if>
+					<ja:if exists="previousFolderPath"><a href="${previousFolderPath}" class="previous"><ja:if exists="previousFolderThumbPath"><img src="${previousFolderThumbPath}"<ja:if test="${addAltTags}"> alt="${previousFolderTitle}"</ja:if>></ja:if><span>${text.previous}: <strong>${previousFolderTitle}</strong></span></a></ja:if>
+				</div>
+</ja:if>
+<ja:if test="<%= !splashVertical && mapOnIndex && locationCount > 0 %>"><div id="map"><div class="cont"></div></div></ja:if>
+
+<ja:include page="page-footer.inc" />

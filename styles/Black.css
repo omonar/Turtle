@@ -1,0 +1,8 @@
+@charset "utf-8";
+
+<ja:include page="includes/hint_dark.css" />
+
+.thumbs td > .caption span.nr {
+	font-weight:bold;
+	color:#222;
+}

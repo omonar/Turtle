@@ -1,0 +1,18 @@
+<ja:if test="${use3dEffects}">
+#main header,
+.gallery .scrollbox,
+.gallery .navigation nav,
+.gallery .bottom .cont,
+#main article {
+	${bs_ml}
+}
+<ja:if test="${splashVertical}">
+#navigation {
+	${bs_ml}
+}
+</ja:if>
+.gallery .img .other,
+.gallery .img .main {
+	${bs_ll}
+}
+</ja:if>

@@ -1,0 +1,21 @@
+<ja:if not exists="backgroundImage">
+#mainbg, .gallery {
+	${bgColor} 
+	background-image:url(bg.jpg);
+	background-position:center top;
+	background-repeat:no-repeat;
+	-moz-background-size:100% 100%;
+	background-size:100% 100%;
+}
+#widgetbg {
+	${bgColor}
+	background-image:url(bg.jpg);
+	background-position:center top;
+	background-repeat:no-repeat;
+	-moz-background-size:100% auto;
+	background-size:100% auto;
+}
+.no-backgroundsize #widgetbg, .no-backgroundsize #mainbg, .no-backgroundsize .gallery {
+	background-repeat:repeat;
+}
+</ja:if>

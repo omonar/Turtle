@@ -1,0 +1,23 @@
+<%-- User interface for editing this page from within jAlbum --%>
+<ja:ui>
+	class AboutUI extends JWebPageUI {
+		
+		JTextField tumblrId = new JTextField(16);
+		JSpinner tumblrPostCnt = new JSpinner(new SpinnerNumberModel(20, 5, 100, 5));
+		{
+			add(new JLabel("Your Tumblr ID"));
+			add("tab", tumblrId);
+			add("br", new JLabel("Number of posts to show"));
+			add("tab", tumblrPostCnt);
+		}
+	}
+</ja:ui>
+
+<ja:include page="page-header.inc" /> <%-- Keep this --%>
+
+				<div id="tumblr-page" class="clearfix">
+					<script type="text/javascript" src="https://${tumblrId}.tumblr.com/js<ja:if exists="tumblrPostCnt">?num=${tumblrPostCnt}</ja:if>"></script>
+				</div>
+
+<ja:include page="page-footer.inc" /> <%-- Keep this --%>
+

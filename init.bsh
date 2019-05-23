@@ -1,0 +1,1702 @@
+/*	
+	init.bsh - the Beanshell script to initialize the skin
+	Author: Laza
+*/
+
+import net.jalbum.filters.auto.*;
+import se.datadosen.util.*;
+import java.util.Date;
+
+// Fixing variables written by v5.3.2 by mistake
+void cleanupProperties(folder) {
+	AlbumObjectProperties aop = folder.getProperties();
+	aop.remove("externalContent");
+	aop.remove("shopDiscountRate");
+	aop.remove("hideLocation");
+	aop.remove("shopOptions");
+	aop.remove("location");
+	aop.remove("videoSize");
+	aop.remove("externalContentSize");
+	aop.save(true);
+}
+
+cleanupProperties(rootFolder);
+
+engine.setRows(0);
+
+Util util = new Util(engine);
+engine.setUsing(util);
+
+// Today
+Long time = (new Date()).getTime();
+int today = (int)(time / 86400000L);
+
+/******************************************** Variables to initialize once */
+
+// Determining the color themes for the widget bar and the Like button
+boolean lightStyle = "Light,White,Yellow,Beige,Cardboard,Creme,Hemp,Leather Light,Paper,Retro,Ricepaper,Shine,Stonewall,Wallpaper,Wood Light,".indexOf(util.styleName+",") >= 0;
+String widgetBarColor = lightStyle? "white" : "black";
+String likeBtnTheme = lightStyle? "light" : "dark";
+String btnColor = lightStyle? "dark" : "light";
+
+// New label attached to images will expire after this number of days
+// newDaysRef (UI) :: 1 = Exif.DateTaken, 2 = FileSystem.modified, 0 = jAlbum.added
+int newDays = (newDaysCount == void || newDaysCount == 0)? -1 : ((newDaysRef == void || newDaysRef.equals("added"))? 0 : (newDaysRef.equals("dateTaken")? 1 : 2));
+
+// Separator string used in photo data and album info bar
+String sep = " &nbsp; &middot; &nbsp; ";
+
+// Dummy javascript link
+String nolink = "javascript:void(0)";
+
+// Texts to export to JavaScript
+String[] translateKeys = new String[]{
+	// addModal
+	"closeWindow",
+	"okButton",
+	"warning",
+	"error",
+	// relative date
+	"today",
+	"yesterday",
+	"daysAgo",
+	"monthsAgo",
+	"yearsAgo",
+	// addPlayer
+	"play",
+	"pause",
+	"stop",
+	"mute",
+	"unmute",
+	"fullScreen",
+	"restoreScreen",
+	"repeat",
+	"repeatOff",
+	"localFlashWarning",
+	"unsupportedMediaFormat",
+	// addShop
+	"addCart",
+	"buyNow",
+	"viewCart",
+	"items",
+	"success",
+	"couponCode",
+	"redeem",
+	"noSuch",
+	"expired",
+	"accepted",
+	"lowerThanCurrent",
+	"higherThanPrice",
+	"reclaimed",
+	// addSocial
+	"shareOn",
+	"checkOutThis",
+	"localWarning",
+	// Search
+	"searchBoxTip",
+	"searchResultsFor",
+	"newImages",
+	"notFound",
+	"foundNImages",
+	"close",
+	// markFoldersNew
+	"newItem",
+	// turtleHelp
+	"help.title",
+	"help.pressF1",
+	"help.topNavigation",
+	"help.upOneLevel", 
+	"help.authorInfo",
+	"help.shareAndLike", 
+	"help.searchNew",
+	"help.search",
+	"help.downloadZip",
+	"help.startSlideshow",
+	"help.previousPicture",
+	"help.backToIndex",
+	"help.toggleFit",
+	"help.toggleInfo",
+	"help.toggleThumbnails",
+	"help.toggleAutoPlay",
+	"help.nextPicture",
+	"help.toggleMeta",
+	"help.toggleMap",
+	"help.toggleShop",
+	"help.downloadImage",
+	"help.shareAndLike",
+	"help.toggleComments",
+	"help.toggleFaces",
+	// turtle
+	"startSlideshow",
+	"atFirstPage",
+	"atLastPage",
+	"atLastPageQuestion", 
+	"startOver", 
+	"backToHome",
+	"stop",
+	"upOneLevel",
+	"backToIndex",
+	"previousPicture",
+	"nextPicture",
+	"previousFolder",
+	"nextFolder",
+	"changeSpeed",
+	"oneToOneSize",
+	"fitToScreen",
+	"showInfo",
+	"hideInfo",
+	"showThumbs",
+	"hideThumbs",
+	"startAutoplay",
+	"stopAutoplay",
+	"clickToOpen",
+	"commentsBtn",
+	"commentsLabel",
+	"metaBtn", 
+	"metaLabel", 
+	"mapBtn",
+	"mapLabel",
+	"shopBtn",
+	"shopLabel",
+	"shareBtn",
+	"shareLabel",
+	"download",
+	"original",
+	"hiRes",
+	"saveTip",
+	"print",
+	"printBtn",
+	"printLabel",
+	"fotomotoBtn",
+	"fotomotoLabel",
+	"mostphotosBtn",
+	"mostphotosLabel",
+	"people",
+	"sendFeedback",
+	"message",
+	"subject",
+	"comment",
+	"yourEmail",
+	"send",
+	"messageSent",
+	"errorSending",
+	"tooLong",
+	"emailMissing",
+	"noItemsSelected",
+	"selectItemsHint",
+	"nonShoppableItems",
+	"buyNItems",
+	"locationWarning",
+	"cookiePolicyText",
+	"cookiePolicyAgree",
+	"cookiePolicyLearnMore"
+};
+
+// Javascript variables compiled upfront
+String jsGlobalVars, jsIndexVars, jsSlideVars, jsShopVars, jsMapVars, jsVideoVars, jsImgHookVars, videoVars;
+
+// Page protocol "https:" or "http:"
+String pageProtocol;
+
+// Are widgets turned on?
+boolean hasWidgets = false;
+
+// Folder image :: this image is copied to the index file's folder with the given name, cropped to the given size
+// Can be used as splash image for example
+// GUI should contain a JTextField folderImageSize, otherwise uncomment this:
+// String folderImageSize = "800x400";
+String folderImageFileName = "folderimage.jpg";
+int folderImageWidth;
+int folderImageHeight;
+
+// Folder thumbnail :: placed along the folder image
+// Can be used for sharing over social sites as page thumbnail
+String folderThumbFileName = "folderthumb.jpg";
+String folderThumbSize = "600x420";
+int folderThumbWidth;
+int folderThumbHeight;
+
+// Default video size
+String videoSize = "640x480";
+
+// ZIP name
+String zipName = rootFolder.getWebName() + ".zip";
+String zipLink;
+boolean anyZip;
+
+// Reduced size thumbnails for the thumbnail scroller area
+double getReduced(n) {
+	if (n instanceof String) {
+		if (n.endsWith("%"))
+			return Float.valueOf(n.substring(0, n.length() - 1)) / 100;
+		else
+			return Float.valueOf(n);
+	}
+	return n;
+}
+double reduce = getReduced(reduceThumbs);
+int reducedThumbWidth = Math.round(maxThumbWidth * reduce);
+int reducedThumbHeight = Math.round(maxThumbHeight * reduce);
+
+// Will the thumbnails load by the javascript? 
+// It's useful to speed up page load and bring javascript page composition upfront. 
+// If yes, placeholders will be used instead of real images 
+boolean postLoad = false;
+String thumbPlaceholder = "load.gif";
+
+// Add thumb data attributes?
+// useful for one-page (javascript-based) albums
+// with multi page albums you can add the data on the slide pages
+boolean addThumbData = true;
+
+// Slideshow cycle length in milliseconds
+int shDelay = 4000;
+
+// Sharing options
+boolean facebookLike = facebookLike != void && util.isTrue(facebookLike);
+boolean twitterTweet = twitterTweet != void && util.isTrue(twitterTweet);
+boolean googlePlus = googlePlus != void && util.isTrue(googlePlus);
+boolean tumblrButton = tumblrButton != void && util.isTrue(tumblrButton);
+boolean pinItButton = pinItButton != void && util.isTrue(pinItButton);
+boolean shareFacebook = shareFacebook != void && util.isTrue(shareFacebook);
+boolean shareTwitter = shareTwitter != void && util.isTrue(shareTwitter);
+boolean sharePinterest = sharePinterest != void && util.isTrue(sharePinterest);
+boolean shareDigg = shareDigg != void && util.isTrue(shareDigg);
+boolean shareDelicious = shareDelicious != void && util.isTrue(shareDelicious);
+boolean shareMyspace = shareMyspace != void && util.isTrue(shareMyspace);
+boolean shareStumbleupon = shareStumbleupon != void && util.isTrue(shareStumbleupon);
+boolean shareReddit = shareReddit != void && util.isTrue(shareReddit);
+boolean shareEmail = shareEmail != void && util.isTrue(shareEmail);
+boolean useFotomoto = useFotomoto != void && util.isTrue(useFotomoto) && fotomotoID != void && !util.isEmpty(fotomotoID);
+boolean useMostphotos = useMostphotos != void && util.isTrue(useMostphotos);
+
+// Is there any sharing option?
+boolean anyShares = 
+	facebookLike ||
+	twitterTweet ||
+	googlePlus ||
+	tumblrButton ||
+	pinItButton ||
+	shareFacebook || 
+	shareTwitter || 
+	shareGplus ||
+	sharePinterest ||
+	shareDigg || 
+	shareDelicious || 
+	shareMyspace || 
+	shareStumbleupon || 
+	shareReddit ||
+	shareEmail;
+
+// HTML attribute
+String htmlAttr = ((facebookLike || shareFacebook)? "prefix=\"og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#\" " : "") + "lang=\"" + util.lang + "\"";
+
+// Page title
+String _title;
+
+// Prepared to pass to javaScript
+String shareArray;
+
+// Map feature
+boolean mapOnIndex;
+boolean mapOnSlide;
+
+// Use Search (text or new image)
+boolean searchOn = (useSearch != void && useSearch) || (useSearchForNew != void && useSearchForNew);
+
+// Will we use checkboxes
+boolean bulkActionsOn;
+
+// The link back to Jalbum
+String credits;
+
+// The link back to the skin site
+String skinLink;
+
+// The string holding all background audio file links separated by comma
+String backgroundAudio;
+
+// Extra images - used in sites only
+String logo;
+
+// Debug mode? Don't use the minified javascript libraries.
+String min = (debugMode != void && debugMode != null && debugMode)? "" : ".min";
+
+// Country code the way Paypal likes it
+String shopLocale;
+boolean shopOnIndex;
+boolean shopOnSlide;
+
+// Global shop options
+String shopOptionsDefault;
+String shopDiscountRateDefault;
+
+// Shall we add ${title} to the search?
+boolean skipTitleFromSearch;
+boolean skipKeywordsFromSearch;
+
+// Full processing on templates?
+boolean processImageCaption;
+boolean processThumbCaption;
+
+// Shorten comments?
+boolean shortenComments = longComments != void && longComments.equals("shorten");
+
+// Items order
+String item0, item1, item2;
+
+
+// Initializing Javascript variables
+
+void getJsVars() {
+	StringBuilder sb = new StringBuilder(2048);
+	int l;
+	
+	// Global vars
+	
+	sb.append("albumName:'").append(util.stripQuot(albumTitle)).append("',");
+	if (util.makeSlides) sb.append("linkSlides:!0,");
+	if (homepageAddress != void && !util.isEmpty(homepageAddress)) {
+		sb.append("uplink:'").append(util.escQuot(homepageAddress)).append("',");
+		sb.append("homepageLinkText:'").append(util.stripQuot(homepageLinkText)).append("',");
+	}
+	if (feedbackEmail != void && !util.isEmpty(feedbackEmail)) {
+		sb.append("feedbackEmail:'").append(feedbackEmail.replace('@','|')).append("',");
+		if (directFeedback != void && directFeedback && directKey != void && !util.isEmpty(directKey)) {
+			sb.append("directKey:'").append(util.xEncrypt(directKey)).append("',");
+		}
+	}
+	if (showCookiePolicy != void && showCookiePolicy) {
+		sb.append("showCookiePolicy:!0,");
+		if (cookiePolicyUrl != void && !util.isEmpty(cookiePolicyUrl)) {
+			sb.append("cookiePolicyUrl:'").append(cookiePolicyUrl).append("',");
+		}
+		if (cookiePolicyStay != void && cookiePolicyStay != 8) {
+			sb.append("cookiePolicyStay:").append(cookiePolicyStay).append(",");
+		}
+	}
+	
+	// Slideshow
+	if (shDelay != void && shDelay != 4000) sb.append("slideshowDelay:").append(shDelay).append(",");
+	if (slideshowLoop != void && slideshowLoop) sb.append("slideshowLoop:!0,");
+	if (slideshowAuto != void && slideshowAuto) sb.append("slideshowAuto:!0,");
+	if (slideshowFullScreen != void && slideshowFullScreen) sb.append("slideshowFullScreen:!0,");
+	if (afterLast != void && !afterLast.equals("ask")) sb.append("afterLast:'").append(afterLast).append("',");
+	
+	// Controls
+	if (enableKeyboard != void && !enableKeyboard) sb.append("enableKeyboard:!1,");
+	if (enableMouseWheel != void && !enableMouseWheel) sb.append("enableMouseWheel:!1,");
+	if (clickForNext != void && !clickForNext) sb.append("clickForNext:!1,");
+	if (clickBesideForIndex != void && clickBesideForIndex) sb.append("clickBesideForIndex:!0,");
+	if (rightClickProtect != void && rightClickProtect) sb.append("rightClickProtect:!0,");
+	if (autohideControls != void && !autohideControls) sb.append("controlOutOpacity:0.7,");
+	if (newDays > 0) sb.append("markNewDays:").append(newDaysCount.toString()).append(",");
+	if (anyShares != void && anyShares) {
+		sb.append("shares:{").append(shareArray).append("},");
+		if (shareBoxType != void && shareBoxType.equals("unboxed")) sb.append("shareInline:!0,");
+	}
+	
+	// Default views
+	if (buttonLabelsVisible != void && buttonLabelsVisible) sb.append("buttonLabels:!0,");
+	if (infoPanelVisible != void && !infoPanelVisible) sb.append("infoOn:!1,");
+	if (commentsVisible != void && commentsVisible) sb.append("commentsOn:!0,");
+	if (photoDataVisible != void && photoDataVisible) sb.append("metaOn:!0,");
+	if (regionsVisible != void && regionsVisible) sb.append("regionsOn:!0,");
+	if (downloadNonImages != void && downloadNonImages) sb.append("downloadNonImages:!0,");
+	if (printImageButton != void && printImageButton) sb.append("printOn:!0,");
+	if (thumbnailsVisible != void && thumbnailsVisible) sb.append("thumbsOn:!0,");
+	if (anyShares != void && anyShares) {
+		if (shareVisible != void && shareVisible) sb.append("shareOn:!0,");
+		if (shareLabelsVisible == void || !shareLabelsVisible) sb.append("shareLabels:!1,");
+	}
+	if (extraSizes != void && !util.isEmpty(extraSizes)) sb.append("extraSizes:'").append(extraSizes).append("',");
+
+	// Transition / fit image
+	if (transitionType != void && transitionType.equals("none")) sb.append("transitions:!1,");
+	if (transitionType != void && transitionType.equals("crossFade")) sb.append("preScale:!1,");
+	if (transitionSpeed != void && transitionSpeed != 600) sb.append("speed:").append(transitionSpeed).append(",");
+	if (fitImages != void && fitImages) {
+		sb.append("fitImage:!0,");
+		if (fitShrinkonly != void && fitShrinkonly) sb.append("fitShrinkonly:!0,");
+	}
+	if (fitPadding != void && fitPadding != 15) sb.append("fitPadding:" + fitPadding + ",");
+	if (dontStretchBehind != void && !dontStretchBehind) sb.append("fitFreespace:!1,");
+	if (hideFitToggle != void && hideFitToggle) sb.append("hideFitBtn:!0,");
+	
+	jsGlobalVars = sb.toString();
+
+	// Map vars
+
+	sb.setLength(0);
+	if (mapOnSlide || mapOnIndex) {	
+		if (mapVisible != void && mapVisible) sb.append("mapOn:!0,");
+		if (mapOnIndex) sb.append("mapOnIndex:!0,");
+		if (mapOnSlide) sb.append("mapOnSlide:!0,");
+		if (mapType != void && !mapType.equals("roadmap")) sb.append("mapType:'").append(mapType).append("',");
+		if (mapZoom != void && mapZoom != 18) sb.append("mapZoom:").append(mapZoom).append(",");
+		if (mapAll != void && mapAll) sb.append("mapAll:!0,");
+	}
+	jsMapVars = sb.toString();
+	
+	// Video vars
+	
+	sb.setLength(0);
+	if (videoAutoPlay != void && videoAutoPlay) sb.append("auto:!0,");
+	if (videoMaximize != void && videoMaximize) sb.append("fullScreen:!0,");
+	if (videoTitleOn != void && videoTitleOn) sb.append("showTitle:!0,");
+	if (prioritizeFlash != void && prioritizeFlash) sb.append("solution:'flash,html',");
+	videoVars = sb.toString();
+	
+  	sb.setLength(0);
+	if (videoAutoPlay != void && videoAutoPlay) sb.append("videoAuto:!0,");
+	if (videoMaximize != void && videoMaximize) sb.append("videoMaximize:!0,");
+	if (videoTitleOn != void && videoTitleOn) sb.append("videoTitleOn:!0,");
+	if (prioritizeFlash != void && prioritizeFlash) sb.append("prioritizeFlash:'flash,html',");
+	jsVideoVars = sb.toString();
+	
+	// Index vars
+
+  	sb.setLength(0);
+	if (homepageAddress != void && !util.isEmpty(homepageAddress)) sb.append("uplink:'").append(util.escQuot(homepageAddress)).append("',");
+	sb.append("licensee:'").append(util.license).append("',");
+	sb.append("thumbHeight:").append(maxThumbHeight).append(",");
+	if (showStartSlideshow != void && !showStartSlideshow) sb.append("showStart:!1,");
+	if (skipIndex != void && skipIndex) sb.append("skipIndex:!0,");
+	if (backgroundAudioSlideshowControl != void && backgroundAudioSlideshowControl) sb.append("bgAudioId:'#bgaudio',");
+	if (showImageNumbers != void && !showImageNumbers) sb.append("showImageNumbers:!1,");
+	if (linkOriginals != void && linkOriginals) sb.append("linkOriginals:!0,");
+	jsIndexVars = sb.toString();
+	
+	// Image hook vars
+  	sb.setLength(0);
+  	if (imgHook != void && !util.isEmpty(imgHook)) {
+		if (imgHookBtn != void && !util.isEmpty(imgHookBtn)) sb.append("imgHookBtn:'").append(imgHookBtn).append("',");
+		if (imgHookWidth != void && imgHookWidth != 600) sb.append("imgHookWidth:").append(imgHookWidth).append(",");
+		if (imgHookFn != void && !util.isEmpty(imgHookFn)) sb.append("imgHookFn:").append(imgHookFn).append(",");
+	}
+	jsImgHookVars = sb.toString();
+	
+}
+
+void getShopVars() {
+	StringBuilder sb = new StringBuilder(2048);
+	// Shop vars
+	
+	if (shopOnIndex || shopOnSlide) {
+		if (shopOnIndex) sb.append("shopIndex:!0,");
+		if (shopVisible != void && !shopVisible) sb.append("shopOn:!1,");
+		if (shopId != void) sb.append("shopId:'").append(shopId.replace('@','|')).append("',");
+		if (shopCurrency != void && !shopCurrency.equals("USD")) sb.append("shopCurrency:'").append(shopCurrency).append("',");
+		if (shopLocale != void && !shopLocale.equals("en_US")) sb.append("shopLocale:'").append(shopLocale).append("',");
+		if (shopHandling != void && !util.isEmpty(shopHandling)) sb.append("shopHandling:'").append(shopHandling).append("',");
+		if (shopDiscountRate != void && !util.isEmpty(shopDiscountRate)) {
+			shopDiscountRateDefault = shopDiscountRate.toString().replaceAll("%", "").trim();
+			sb.append("shopDiscount:'").append(shopDiscountRateDefault).append("',");
+		}
+		if (shopOptions != void && !util.isEmpty(shopOptions)) {
+			shopOptionsDefault = util.cleanup(shopOptions.replaceAll("\\n", "::"));
+			sb.append("shopOptions:'").append(shopOptionsDefault).append("',");
+		}
+		if (shopQuantityCap != void && !util.isEmpty(shopQuantityCap)) sb.append("shopQuantityCap:").append(shopQuantityCap).append(",");
+		if (shopContinueUrl != void && !util.isEmpty(shopContinueUrl)) sb.append("shopContinueUrl:'").append(util.urlEncodeSafe(shopContinueUrl)).append("',");
+		if (shopItemNameUses != void && !util.isEmpty(shopItemNameUses)) sb.append("shopItemNameUses:'").append(shopItemNameUses).append("',");
+		if (shopCoupons != void && !util.isEmpty(shopCoupons)) sb.append("shopCoupons:'").append(util.xEncrypt(shopCoupons.toString().replaceAll("\\n", "::"))).append("',");
+	}
+	jsShopVars = sb.toString();
+}
+
+// Compiling share array
+
+String getShareArray() {
+	StringBuilder sb = new StringBuilder(256);
+	
+	if (facebookLike) sb.append("facebookLike:!0,");
+	if (twitterTweet) sb.append("twitterTweet:!0,");
+	if (googlePlus) sb.append("googlePlus:!0,");
+	if (tumblrButton) sb.append("tumblrBtn:!0,");
+	if (pinItButton) sb.append("pinItBtn:!0,");
+	if (shareFacebook) sb.append("facebook:!0,");
+	if (shareTwitter) sb.append("twitter:!0,");
+	if (shareGplus) sb.append("gplus:!0,");
+	if (sharePinterest) sb.append("pinterest:!0,");
+	if (shareDigg) sb.append("digg:!0,");
+	if (shareDelicious) sb.append("delicious:!0,");
+	if (shareMyspace) sb.append("myspace:!0,");
+	if (shareStumbleupon) sb.append("stumbleupon:!0,");
+	if (shareReddit) sb.append("reddit:!0,");
+	if (shareEmail) sb.append("email:!0,");
+	if (sb.length() > 0) sb.setLength(sb.length() - 1);
+	
+	return sb.toString();
+}
+
+// Initializing the skin (runs once per make)
+
+// Get corresponding item name
+
+String itemName(char c) {
+	if (c == 'f')
+		return "folders";
+	else if (c == 'p')
+		return "pages";
+	return "images";
+}
+
+// Initializing the skin
+
+{
+	Dimension d;
+	
+	// Setting up filters
+	if (fixedShapeThumbs != void && fixedShapeThumbs) {
+		if (preZoomThumbs != void && preZoomThumbs > 100) {
+			ZoomFilter zoom = new ZoomFilter();
+			zoom.setZoomPercent(preZoomThumbs - 100);
+			engine.addFilter(zoom, JAFilter.THUMBNAILS_PRESCALE_STAGE);
+		}
+		FixedShapeFilter fixed = new FixedShapeFilter();
+		engine.addFilter(fixed, JAFilter.THUMBNAILS_PRESCALE_STAGE);
+	}
+	
+	// Watermark
+	if (watermark != void && !util.isEmpty(watermark)) {
+		WatermarkFilter wm = new WatermarkFilter();
+		wm.setText(watermark.toString());
+		if (watermarkFont == void || util.isEmpty(watermarkFont)) {
+			wm.setFace("Arial");
+			wm.setStyle("bold");
+		} else {
+			wm.setFace(watermarkFont);
+		}	
+		wm.setSize((watermarkSize != void)? (Integer)watermarkSize : 20);
+		wm.setColor("#ffffff");
+		wm.setStrengthPercent((watermarkStrength != void)? (Integer)watermarkStrength : 15);
+		wm.setAlign((watermarkPosition != void && !util.isEmpty(watermarkPosition))? watermarkPosition.split(" ")[0] : "right");
+		wm.setValign((watermarkPosition != void && !util.isEmpty(watermarkPosition))? watermarkPosition.split(" ")[1] : "bottom");
+		wm.setMargin(20);
+		wm.setAntialias(true);
+		engine.addFilter(wm, JAFilter.CLOSEUPS_POSTSCALE_STAGE);
+	}
+	
+	// Logo filter
+	if (logoFilterFilename != void && !util.isEmpty(logoFilterFilename)) {
+		LogoFilter lf = new LogoFilter();
+		if (!logoFilterFilename.startsWith("http://") && !logoFilterFilename.startsWith("file://")) {
+			logoFilterFilename = "file:///" + logoFilterFilename;
+		}
+		try {
+			lf.setSrc(logoFilterFilename);
+		} catch(IOException e) {
+			util.log("Can't open logo file", e);
+		}
+		lf.setStrengthPercent((logoFilterStrength != void)? (Integer)logoFilterStrength : 100);
+		lf.setAlign((logoFilterPosition != void && !util.isEmpty(logoFilterPosition))? logoFilterPosition.split(" ")[0] : "left");
+		lf.setValign((logoFilterPosition != void && !util.isEmpty(logoFilterPosition))? logoFilterPosition.split(" ")[1] : "top");
+		lf.setMargin((logoFilterMargin != void && logoFilterMargin != null)? (Integer)logoFilterMargin : 15);
+		engine.addFilter(lf, JAFilter.CLOSEUPS_POSTSCALE_STAGE);
+	}
+	
+	// Grayscale
+	if (grayScale != void && grayScale) {
+		engine.addFilter(new GrayscaleFilter());
+	}
+	
+	// Auto correct
+	if (autoCorrect != void && autoCorrect) {
+		if (AutoCorrectionFilter != void) {
+			AutoCorrectionFilter auto = new AutoCorrectionFilter(); 
+			auto.setColors(true);
+			auto.setLevels(true);
+			engine.addFilter(auto);
+		}
+	}
+	
+	// "Mark as new" number of days :: make sure it's integer
+	if (newDaysCount != void && newDaysCount != null)
+		newDaysCount = util.getInt(newDaysCount);
+	
+	// Slideshow delay in ms
+	if (slideshowDelay != void && slideshowDelay != null)
+		shDelay = Math.round(util.getFloatNum(slideshowDelay) * 1000);
+		
+	// Preparing folder image size
+	if (folderImageSize != void && !util.isEmpty(folderImageSize) && (d = util.getDim(folderImageSize)) != null) {
+		folderImageWidth = d.width;
+		folderImageHeight = d.height;
+		//System.out.println(folderImageSize + " = " + folderImageWidth + " x " + folderImageHeight);
+	}
+	
+	// Preparing folder thumb size
+	if (folderThumbSize != void && !util.isEmpty(folderThumbSize) && (d = util.getDim(folderThumbSize)) != null) {
+		folderThumbWidth = d.width;
+		folderThumbHeight = d.height;
+	}
+	
+	// Video size
+	if (boxSize != void && !util.isEmpty(boxSize) && (d = util.getDim(boxSize)) != null) {
+		boxWidth = d.width;
+		boxHeight = d.height;
+	}
+	
+	// Preparing credits
+	credits = "<a href=\"" + generatorUrl + 
+		"\" rel=\"generator\" target=\"_blank\" title=\"" +	util.getText("getJalbumNow") + ", " + internalVersion + "\" data-tooltip>" + 
+		((creditText != void && !util.isEmpty(creditText))? 
+			creditText : util.getText("credit").replaceAll("\\{0}", util.getText("photoAlbums")).replaceAll("\\{1}", "jAlbum")) + 
+		"</a>";
+	skinLink = "<a href=\"http://lazaworx.com/\" rel=\"generator\" target=\"_blank\" data-tooltip=\"#stt\">" + skin + "</a>" +
+		"<span id=\"stt\" class=\"hidden\">" + util.getText("skin") + ": " + skin + " " + util.styleName + ", " + util.skinVersion + 
+		" <a href=\"https://jalbum.net/skins/skin/" + skin + "\" target=\"_blank\">" + util.getText("download") + "</a></span>";
+		
+	if (!useAlbumAudioAsBackground)
+		backgroundAudio = util.copyBackgroundAudio();
+	
+	util.copyDirectory(new File(skinDirectory, "copy"), rootOutputDirectory);
+	
+	logo = util.urlEncode(logoName);
+	
+	shareArray = getShareArray();
+
+	pageProtocol = util.basePath.startsWith("https://")? "https:" : "http:";
+	
+	hasWidgets = !util.isHeadless() && Widgets.hasWidgets(rootFolder, engine); //util.hasWidgets();
+	
+	if (searchOn)
+		util.startSearch(new File(resDirectory, "search.js"), newDays == 0);
+	
+	mapOnIndex = showMap != void && (showMap.equals("index") || showMap.equals("both"));
+	mapOnSlide = showMap != void && (showMap.equals("slide") || showMap.equals("both"));
+	
+	if (showShop != void && showShop && shopId != void && !util.isEmpty(shopId) && !"-".equals(shopOptions)) {
+		if (shopPlacement == void) {
+			shopOnIndex = false;
+			shopOnSlide = true;
+		} else if (shopPlacement.equals("both")) {
+			shopOnIndex = shopOnSlide = true;
+		} else {
+			shopOnIndex = shopPlacement.equals("index");
+			shopOnSlide = shopPlacement.equals("slide");
+		}
+		shopLocale = util.lang.toUpperCase();
+		if (shopLocale.equals("EN")) {
+			switch(shopCurrency) {
+				case "GBP":
+					shopLocale = "GB";
+					break;
+				case "AUD":
+					shopLocale = "AU";
+					break;
+				case "CAD":
+					shopLocale = "CA";
+					break;
+				default:
+					shopLocale = "US";
+			}					
+		} else if (shopLocale.equals("FR")) {
+			shopLocale = shopCurrency.equals("CAD")? "CA" : "FR";
+		} else if (shopLocale.equals("PT")) {
+			shopLocale = shopCurrency.equals("EUR")? "PT" : "BR";
+		} else if (shopLocale.equals("SV")) {
+			shopLocale = "SE";
+		}
+	} else {
+		shopOnIndex = shopOnSlide = false;
+	}
+	
+	skipTitleFromSearch = imgCaptionTemplate.contains("${title}") || imgCaptionTemplate.contains("${fileTitle}") || imgCaptionTemplate.contains("${fileLabel}");
+	skipKeywordsFromSearch = imgCaptionTemplate.contains("${keywords}");
+	processImageCaption = imgCaptionTemplate.contains("<ja:") || imgCaptionTemplate.contains("<%");
+	processThumbCaption = thumbCaptionTemplate.contains("<ja:") || thumbCaptionTemplate.contains("<%");
+	
+	// Creating global js variables
+	getJsVars();
+	
+	// Creating all.js
+	util.mergeJs("js",
+		
+		// 3rd party libraries
+		"brandonaaron.mousewheel,tkyk.history," + 
+		// laza libraries
+		"laza.util,laza.cookie,laza.transform.translate,laza.fullscreen," + 
+		"laza.dbltap,laza.alignto,laza.addtooltip,laza.addmodal," + 
+		"laza.loadimages,laza.addscroll,laza.thumbscroll,laza.addswipe," + 
+		"laza.addplayer,laza.addmap,laza.addshop,laza.addsocial," +
+		// main Js
+		"main",
+		
+		// Output name
+		"all",
+		
+		// Debug mode?
+		debugMode,
+		
+		// Texts to translate
+		translateKeys
+	);
+	
+	// Items (determining order of Folder/Images/Pages)
+	item0 = itemName(itemsOrder.charAt(0));
+	item1 = (itemsOrder.length() > 1)? itemName(itemsOrder.charAt(1)) : "";
+	item2 = (itemsOrder.length() > 2)? itemName(itemsOrder.charAt(2)) : "";
+	
+	if (themeImagePattern != void && !util.isEmpty(themeImagePattern)) {
+		util.copyResource("patterns/header/" + (lightStyle? "light":"dark"), themeImagePattern, "mask.png");
+	}
+	
+}
+
+/******************************************** Variables to initialize on each index page */
+
+boolean skipIndex;
+
+// item category = folder | webPage | image | audio | video | other
+// images with external content = other
+Category _category;
+
+// flag if a folder has folder image or not
+boolean hasFolderImage;
+
+// Path to the folder image relative from album root needed by social sites to fetch the album thumbnail
+String folderThumbPath;
+String pageThumbPath;
+String pageUrl;
+
+// Footer links :: images | bottomNavigation | credits | Help
+String footerLinks;
+
+// Navigation bars - the variables used on the page
+String topNavigation;
+String bottomNavigation;
+
+// HTML formatted path to the current folder, e.g.: Family Album >> 2010 >> Tanzania 
+String indexBreadcrumbPath;
+String breadcrumbPath; 
+
+// The link that takes one level up or a predefined 'home' link from the top level page
+String uplink;
+String uplinkText;
+
+// Header and footer for the current folder
+String pageHeader;
+String pageFooter;
+
+// Counters for the different items found on a page
+int folderCount, webLocationCount, pageCount, folderImgCount, thumbCount, imageCount, videoCount, audioCount, otherCount, shopCount, locationCount, zipCount;
+boolean anyMedia;
+
+// Relative path from the album root to the current folder
+String relPath;
+
+// Next folder properties
+String previousFolderPath;
+String previousFolderTitle;
+String previousFolderThumbPath;
+String nextFolderPath;
+String nextFolderTitle;
+String nextFolderThumbPath;
+String nextFoldersFirst;
+String previousFoldersLast;
+
+// Extra variables (on image pages)
+
+// caption = the formatted caption based on the captionTemplate
+String caption;
+String captionClean;
+
+// image number - folders excluded
+// background audio files skipped
+int _imageNum;
+
+// Facebook commenting?
+boolean facebookCommentsOn;
+
+// Disqus commenting?
+boolean disqusCommentsOn;
+
+// Hide loacation in current folder?
+boolean hideLocationFolder;
+
+// Can select multiple items?
+boolean canSelectMultiple;
+
+// Total number of items (subdirectories included)
+int totalImageCount;
+int totalVideoCount;
+int totalAudioCount;
+int totalOtherCount;
+
+// Initializing counters
+
+void countFiles() {
+	String s;
+	Category cat;
+	boolean checkZip = zipImages != void && zipImages.equals("included"), 
+		checkMap = showMap != void && !showMap.equals("none"), inc;
+	Map vars, meta;
+
+	folderCount = 0;
+	webLocationCount = 0;
+	pageCount = 0;
+	thumbCount = 0;
+	imageCount = 0;
+	videoCount = 0;
+	audioCount = 0;
+	otherCount = 0;
+	locationCount = 0;
+	zipCount = 0;
+	
+	if (useAlbumAudioAsBackground) 
+		backgroundAudio = "";
+	
+	for (AlbumObject ao : currentFolder.getChildren()) {
+		if (ao.isIncluded() && !ao.isHidden()) {
+			cat = ao.getCategory();
+			
+			switch (cat.name()) {
+				
+				case "webPage":
+					pageCount++;
+					break;
+					
+				case "webLocation":
+					webLocationCount++;
+					break;
+					
+				case "folder":
+					folderCount++;
+					break;
+					
+				case "video":
+					videoCount++;
+					break;
+					
+				case "audio":
+					if (useAlbumAudioAsBackground) {
+						s = ao.getName();
+						backgroundAudio += ((backgroundAudio.length() > 0)? "::" : "") + s;
+					} else {
+						audioCount++;
+					}
+					break;
+					
+				case "image":					
+					vars = ao.getVars();
+					s = vars.get("externalContent");
+					if (!util.isEmpty(s)) {
+						otherCount++;  // Using external content
+					} else {
+						imageCount++;  // Normal image
+					}
+					
+					if (!hideLocationFolder && checkMap && util.checkLocation(ao)) {
+						locationCount++;
+					}
+					break;
+					
+				default:
+					otherCount++;
+			}
+		}
+		
+		if (checkZip && (cat != Category.webPage) && (cat != Category.folder)) {
+			inc = ao.getProperties().get(AlbumObjectProperties.INCLUDE_ORIGINAL, Boolean.FALSE);
+			if (inc) {
+				zipCount++;
+			}
+		}				
+	}
+		
+	thumbCount = imageCount + videoCount + audioCount + otherCount;
+	
+	if (!checkZip) {
+		zipCount = thumbCount;
+	}
+	//System.out.println("imageCount:"+imageCount+ " videoCount:" + videoCount + " audioCount:"+audioCount + " otherCount:"+otherCount);
+}				
+	
+void initPage() {
+
+	String current, currentHtml;
+	
+	if (pageType.equals("slide")) {
+		
+		// Slide page
+		
+		_title = util.cleanup(util.stripHTML(title));
+		
+		_category = (externalContent == void || util.isEmpty(externalContent))? fileCategory : Category.other;
+		
+		currentHtml = util.urlEncode(label) + util.pageExt;
+		
+		uplink = util.indexName;
+		uplinkText = util.getText("backToIndex");
+		
+		if (comment != void && !util.isEmpty(comment)) {
+			try {
+				caption = engine.processTemplate((preFormat != void && preFormat)? util.formatPlainText(comment) : comment);
+			} catch (ElementException e) {
+				util.log("Error processing comment", e);
+			}
+		} else {
+			caption = "";
+		}
+		
+		captionClean = util.cleanup(util.stripHTML(caption));
+		
+		if (util.basePath.length() > 0) {
+			pageUrl = util.basePath + util.urlEncodeFix(relPath + util.slidesDir + "/" + currentHtml);
+			pageThumbPath = util.basePath + util.urlEncodeFix(relPath + (util.linkOriginals? "" : (util.slidesDir + "/")) + util.urlEncode(util.fixExtension(fileName)));
+		} else
+			pageUrl = pageThumbPath = "";
+		
+		anyMedia = (_category == Category.audio || _category == Category.video);
+		shopCount = 0;
+		locationCount = 0;
+		facebookCommentsOn = (facebookCommenting != void && facebookCommenting) && (facebookCommentingPlacement.equals("slide") || facebookCommentingPlacement.equals("both"));
+		disqusCommentsOn = (disqusCommenting != void && disqusCommenting) && (disqusCommentingPlacement.equals("slide") || disqusCommentingPlacement.equals("both"));
+		canSelectMultiple = false;
+		
+		updateImage(true);
+		
+	} else {
+	
+		relPath = util.urlEncode(util.getRelPath(currentFolder));
+		
+		if (pageType.equals("page")) {
+			
+			// Custom page
+			
+			if (title.equals("NewPhotos"))
+				_title = texts.getString("newPhotos");
+			else if (title.equals("TumblrFeed"))
+				_title = texts.getString("tumblrFeed");
+			else
+				_title = util.cleanup(title);
+			
+			_category = Category.webPage;
+			
+			current = fileName.replace(".htt", util.pageExt);
+			currentHtml = util.urlEncode(current);
+			
+			uplink = util.indexName;
+			uplinkText = util.getText("backToIndex");
+			
+			skipIndex = false;
+			
+			previousFolderPath = nextFolderPath = "";
+			
+			topNavigation = showTopNavigation? util.getNavigation(currentObject, util.isEmpty(logo), topNavigationExcludeFolders) : "";
+			bottomNavigation = showBottomNavigation? util.getRootNavigation(currentObject) : "";
+			
+			breadcrumbPath = indexBreadcrumbPath + "<a href=\"" + util.indexName + "\">" + currentFolder.getTitle() + "</a>";
+			
+			pageUrl = (util.basePath.length() > 0)? util.basePath + util.urlEncodeFix(relPath + currentHtml) : "";
+			
+			if (footerTopLevelOnly) {
+				pageFooter = "";
+			}
+			
+			if (comment != void && !util.isEmpty(comment)) {
+				try {
+					caption = engine.processTemplate(preFormat? util.formatPlainText(comment) : comment);
+				} catch (ElementException e) {
+					util.log("Error processing page comment", e);
+				}
+			} else {
+				caption = "";
+			}
+				
+			captionClean = util.cleanup(util.stripHTML(caption));
+	
+			_imageNum = 0;
+			
+			locationCount = 0;
+			
+			anyZip = false;
+			anyMedia = false; 
+			
+			facebookCommentsOn = (facebookCommenting != void && facebookCommenting) && (facebookCommentingPlacement.equals("index") || facebookCommentingPlacement.equals("both"));
+			disqusCommentsOn = (disqusCommenting != void && disqusCommenting) && (disqusCommentingPlacement.equals("index") || disqusCommentingPlacement.equals("both"));
+			
+			if (currentObject.getName().equals("NewPhotos.htt")) {
+				canSelectMultiple = true;
+				bulkActionsOn = feedbackEmail != void && !util.isEmpty(feedbackEmail) || 
+					shopOnIndex != void && shopOnIndex ||
+					fotomotoBulk != void && fotomotoBulk;
+			} else {
+				bulkActionsOn = canSelectMultiple = false;
+			}
+			
+		} else if (pageType.equals("index")) {
+			
+			// Index page 
+			
+			_title = util.cleanup(util.stripHTML((level == 0)? albumTitle : title));
+			
+			_category = Category.folder;
+			
+			current = currentHtml = util.indexName;
+			
+			if (level > 0) {
+				uplink = parentIndexPage;
+				uplinkText = "";
+			} else {
+				uplink = (homepageAddress == void || util.isEmpty(homepageAddress))? "" : homepageAddress;
+				uplinkText = (homepageLinkText == void || util.isEmpty(homepageLinkText))? util.getText("backToHome") : homepageLinkText;
+			}
+				
+			if (linkNeighboringFolders || afterLast.equals("ask") || afterLast.equals("nextfolder")) {
+				
+				AlbumObject ao;
+				Scope vars;
+				String s;
+				
+				if ((ao = util.getPreviousFolder(currentFolder)) != null) {
+					vars = ao.getVars();
+					previousFolderPath = "../" + (String)vars.get("closeupPath");
+					s = ao.getWebName();
+					previousFolderTitle = ao.getTitle();
+					if (util.isEmpty(previousFolderTitle)) {
+						previousFolderTitle = ao.getName();
+					}
+					previousFolderThumbPath = "../" + (String)vars.get("thumbPath");
+					if ((ao = util.getLastImage(ao)) != null) {
+						if (util.makeSlides)
+							previousFoldersLast = "../../" + s + "/" + util.slidesDir + "/" + util.replaceExt(ao.getWebName());
+						else
+							previousFoldersLast = "../" + s + "/" + util.indexName + "#" + util.getFinalName(ao);
+					} else {
+						nextFoldersFirst = "";
+					}
+				} else {
+					previousFolderPath = previousFolderTitle = previousFolderPath = previousFoldersLast = "";
+				}
+				
+				if ((ao = util.getNextFolder(currentFolder)) != null) {
+					vars = ao.getVars();
+					nextFolderPath = "../" + (String)vars.get("closeupPath");
+					s = ao.getWebName();
+					nextFolderTitle = ao.getTitle();
+					if (util.isEmpty(nextFolderTitle)) {
+						nextFolderTitle = ao.getName();
+					}
+					nextFolderThumbPath = "../" + (String)vars.get("thumbPath");
+					if ((ao = util.getFirstImage(ao)) != null) {
+						if (util.makeSlides)
+							nextFoldersFirst = "../../" + s + "/" + util.slidesDir + "/" + util.replaceExt(ao.getWebName());
+						else
+							nextFoldersFirst = "../" + s + "/" + util.indexName + "#" + util.getFinalName(ao);
+					} else {
+						nextFoldersFirst = "";
+					}
+				} else {
+					nextFolderPath = nextFolderTitle = nextFolderPath = nextFoldersFirst = "";
+				}
+			}					
+
+			topNavigation = showTopNavigation? util.getNavigation(currentObject, util.isEmpty(logo) && level > 0, topNavigationExcludeFolders) : "";
+			bottomNavigation = showBottomNavigation? util.getRootNavigation(currentObject) : "";
+				
+			indexBreadcrumbPath = breadcrumbPath = util.getBreadcrumbPath(currentFolder);
+			
+			hasFolderImage = util.copyFolderImages(currentFolder, folderImageFileName, (level > 0)? (folderImageWidth + "x" + folderImageHeightSubAlbum) : folderImageSize, folderThumbFileName, folderThumbSize, themeImageBlur);
+			
+			if (util.basePath.length() > 0) {
+				pageUrl = util.basePath + util.urlEncodeFix(relPath + util.indexName);
+				folderThumbPath = util.basePath + util.urlEncodeFix(relPath + folderThumbFileName);
+			} else {
+				pageUrl = folderThumbPath = "";
+			}
+				
+			pageThumbPath = folderThumbPath;
+			
+			hideLocationFolder = hideLocation != void && hideLocation;
+			
+			countFiles();
+			
+			totalImageCount = totalVideoCount = totalAudioCount = totalOtherCount = 0;
+			
+			getShopVars();
+			
+			skipIndex = !util.makeSlides && skipThumbnailPage && folderCount == 0 && webLocationCount == 0 && thumbCount > 0;
+			
+			if (description != void && !util.isEmpty(description)) {
+				try {
+					caption = engine.processTemplate(preFormat? util.formatPlainText(description) : description);
+				} catch (ElementException e) {
+					util.log("Error processing description", e);
+				}
+			} else {
+				caption = "";
+			}
+			
+			captionClean = util.cleanup(util.stripHTML(caption));
+			
+			_imageNum = 0;
+			
+			pageHeader = "";
+			pageFooter = "";
+			
+			if (!skipIndex) {
+				if (header != void && !util.isEmpty(header) && (level == 0 || !headerTopLevelOnly)) {
+					try {
+						pageHeader = engine.processTemplate(preFormat? util.formatPlainText(header) : header);
+					} catch (ElementException e) {
+						util.log("Error processing header", e);
+					}
+				}
+				if (footer != void && !util.isEmpty(footer) && (level == 0 || !footerTopLevelOnly)) {
+					try {
+						pageFooter = engine.processTemplate((preFormat && footer.indexOf("<") == -1)? util.formatPlainText(footer) : footer);
+					} catch (ElementException e) {
+						util.log("Error processing footer", e);
+					}
+				}
+				
+				anyZip = false;
+				if (zipImages != void) {
+					if (zipImages.equals("album")) {
+						zipLink = ((level > 0)? (rootPath + "/") : "") + zipName;
+						anyZip = true;
+					} else if (!zipImages.equals("none")) {
+						zipLink = currentFolder.getWebName() + ".zip";
+						anyZip = zipCount > 0;
+					}
+					zipLink = util.urlEncode(zipLink);
+				}
+			}
+			
+			folderImgCount = 0;
+			shopCount = 0;
+			anyMedia = videoCount > 0 || audioCount > 0;
+			
+			facebookCommentsOn = (facebookCommenting != void && facebookCommenting) && (facebookCommentingPlacement.equals("index") || facebookCommentingPlacement.equals("both"));
+			disqusCommentsOn = (disqusCommenting != void && disqusCommenting) && (disqusCommentingPlacement.equals("index") || disqusCommentingPlacement.equals("both"));
+			
+			// Bulk actions
+			
+			canSelectMultiple = thumbCount > 0;
+			 
+			bulkActionsOn = feedbackEmail != void && !util.isEmpty(feedbackEmail) || 
+			 	shopOnIndex != void && shopOnIndex ||
+			 	fotomotoBulk != void && fotomotoBulk;
+			 				 	
+			// Adding search on page
+			
+			util.startPageSearch(relPath);
+		}
+				
+		if (pageType.equals("page") || level > 0) {
+			util.addSearchItem(
+				current, 
+				new String[] { 
+					_title, 
+					util.isEmpty(caption)? "" : caption, 
+					(keywords == void || keywords == null)? "" : keywords 
+				}
+			);
+		}
+	}
+}
+
+void getFooterLinks() {	
+	boolean first = true;
+	StringBuilder sb = new StringBuilder(2048);
+	
+	if (showImageCount != void && showImageCount) {
+		//int i = thumbCount + folderImgCount;
+		//((level == 0)? totalAlbumImages : (thumbCount + folderImgCount));
+		if (totalImageCount > 0) {
+			sb.append(totalImageCount + " " + util.getText((totalImageCount > 1)? "images" : "image"));
+			first = false;
+		}
+		if (totalVideoCount > 0) {
+			if (!first) sb.append(sep);
+			sb.append(totalVideoCount + " " + util.getText((totalVideoCount > 1)? "videos" : "video"));
+			first = false;
+		}
+		if (totalAudioCount > 0) {
+			if (!first) sb.append(sep);
+			sb.append(totalAudioCount + " " + util.getText((totalAudioCount > 1)? "audios" : "audio"));
+			first = false;
+		}
+		if (totalOtherCount > 0) {
+			if (!first) sb.append(sep);
+			sb.append(totalOtherCount + " " + util.getText((totalOtherCount > 1)? "others" : "other"));
+			first = false;
+		}
+	}
+	if (!util.isEmpty(bottomNavigation)) {
+		if (first) first = false; 
+		else sb.append(sep);
+		sb.append(bottomNavigation);
+	}
+	if (customLink != void && !util.isEmpty(customLink)) {
+		if (first) first = false; 
+		else sb.append(sep);
+		sb.append("<a href=\"" + customLink + "\">" + ((customLinkText == void || util.isEmpty(customLinkText))? customLink : customLinkText) + "</a>");
+	}
+	if (util.excludeCredits == null || !util.excludeCredits) {
+		if (first) first = false; 
+		else sb.append(sep);
+		sb.append(credits + " &amp; " + skinLink);
+	}
+	if (showHelp != void && showHelp) {
+		if (first) first = false; 
+		else sb.append(sep);
+		sb.append("<a href=\"javascript:void(0)\" title=\"" + util.getText("getHelp") + "\" data-tooltip class=\"helplink\">" + util.getText("help") + "</a>");
+	}
+	
+	footerLinks = sb.toString();
+		
+}
+
+void closePage() {
+	if (searchOn) {
+		util.stopPageSearch();
+	}
+}
+
+// Getting thumbnail caption for the slide page scroller
+/*
+String getThumbCaption() {
+	
+	return util.stripQuot((thumbCaptionTemplate == void || thumbCaptionTemplate == null)? 
+		comment : processTemplate(currentObject, thumbCaptionTemplate));
+}
+*/
+// Initializing local variables in the <ja:fileIterator> loop
+
+String _imagePath;
+String _thumbPath;
+String _moviePath;
+String _ext;
+String _thumbExt;
+String _caption;
+String _thumbCaption;
+String _alt;
+int _fileCount;
+String _counters;
+long _modifiedDays;
+String _link;
+boolean _original;
+String _fileSize;
+String _meta;
+String _regions;
+String _regionNames;
+String _gpsLocation;
+String _shop;
+String _discount;
+int _boxWidth;
+int _boxHeight;
+String _external;
+
+// Updating image
+
+void updateImage(boolean allData) {
+		
+	// thumbPath and imagePath
+	// System.out.println("**********************************\nFile: " + fileName + "\n  thumbPath: " + thumbPath + "\n  iconPath: " + iconPath + "\n  imagePath: " + imagePath + "\n  size: " + imageWidth + " x " + imageHeight);
+	if (iconPath != void && iconPath != null) {
+		// Audio, video, other - no THM file
+		_thumbPath = thumbPath;
+		if (_category == Category.video)
+			_imagePath = resPath + "/video.poster.jpg";
+		else if (_category == Category.audio)
+			_imagePath = resPath + "/audio.poster.jpg";
+		else
+			_imagePath = imagePath;
+	} else {
+		// Image or audio / video / other with THM file
+		_thumbPath = resPath + "/blank.png";
+		if (_category == Category.other)
+			_imagePath = thumbPath;
+		else
+			_imagePath = imagePath;
+	}
+
+	// Link to original or high-res
+	_link = (_category == Category.image && hiResPath != void && hiResPath != null)? 
+		hiResPath : ((originalPath != void && originalPath != null)? originalPath : "");
+		
+	// Image has original :: boolean
+	_original = (hiResPath == void || hiResPath == null) && (originalPath != void && originalPath != null);
+	
+	// file extension
+	_ext = util.getExt(imagePath);
+	if (util.isEmpty(_ext)) {
+		System.out.println("WARNING: File with no extension: " + relPath + "/" + imagePath);
+	}
+	
+	// Title
+	if (fileTitle != void && !util.isEmpty(fileTitle)) {
+		_title = util.cleanup(fileTitle);
+	} else {
+		_title = title.replaceAll("_", " "); 
+	}
+	
+	// Caption
+	if (processImageCaption) {	
+		try {
+			_caption = util.processTemplate(currentObject, imgCaptionTemplate, _imageNum);
+			_caption = engine.processTemplate(_caption);
+		} catch (ElementException e) {
+			util.log("Error processing image template", e);
+		}
+	} else {
+		_caption = util.processTemplate(currentObject, imgCaptionTemplate, _imageNum);
+		//System.out.println("Comment = " + comment + " Caption = " + _caption); 
+	}
+	if (preFormat != void && preFormat)
+		_caption = util.stripLinebreak(util.formatPlainText(_caption));
+				
+	// ALT attribute
+	if (addAltTags != void && addAltTags) {
+		if (!util.isEmpty(s = util.stripHTML(_caption)))
+			_alt = s;
+		else
+			_alt = _title;
+		if (keywords != void && !util.isEmpty(keywords))
+			_alt += " : " + keywords;
+		if (!util.isEmpty(_regionNames)) {
+			_alt += " : " + _regionNames;
+		}
+		_alt = util.cleanup(_alt);
+	} else
+		_alt = "";
+		
+	// Modified days
+	if (useSearchForNew || (newDaysCount != void && newDaysCount > 0)) {
+		switch (newDays) {
+			case 0:
+				_modifiedDays = (int)(currentObject.getWhenAdded() / 86400000L);
+				break;
+			case 1:
+				_modifiedDays = util.fileDateTakenDays(currentObject);
+				break;
+			default:
+				_modifiedDays = util.fileModifiedDays(currentObject);
+		}
+		if (_modifiedDays == null) {
+			_modifiedDays = 0L;
+		}
+	} else {
+		_modifiedDays = 0L;
+	}
+	
+	// File size
+	_fileSize = (fileSize != void && fileSize != null)? 
+		util.getSizeAsString(fileSize) : "";
+			
+	// Map
+	_gpsLocation = "";
+	if ((!hideLocationFolder && (hideLocation == void || !hideLocation)) && (mapOnIndex || (mapOnSlide && allData))) {
+		_gpsLocation = util.getLocation(currentObject);
+	}
+
+	
+	// We need all the extra data and features
+	// 1. for the index page thumbs when no slide pages
+	// 2. for the separate slide pages
+	if (allData) {
+
+		// Resetting features
+		_meta = "";
+		_regions = "";
+		_regionNames = "";
+		_shop = "";
+		
+		// Initializations per category, e.g. box dimensions
+		
+		switch (_category) {
+			
+			case image:
+				
+				// Images
+				// Getting Meat and Regions
+				if (showPhotoData)
+					_meta = util.stripQuot(util.getPhotoData(currentObject));
+				
+				if (showRegions) {
+					_regions = util.stripQuot(util.getRegions(currentObject));
+					_regionNames = util.getRegionNames(_regions);
+				}
+				
+				_boxWidth = imageWidth;
+				_boxHeight = imageHeight;
+				break;
+						
+			case audio:
+			case video:
+				
+				// Video or Audio
+				
+				if (videoWidth != void && videoWidth != null && 
+					videoHeight != void && videoHeight != null) {
+					// jAlbum tells the video size - best case
+					_boxWidth = videoWidth;
+					_boxHeight = videoHeight;
+				} else if (iconPath == void || iconPath == null) {
+					// Use the poster image size
+					_boxWidth = imageWidth;
+					_boxHeight = imageHeight;
+				} else {
+					// No THM file
+					if (_category == Category.video) {
+						// Video
+						Dimension d = (videoSize != void && !util.isEmpty(videoSize))? util.getDim(videoSize) : null;
+						if (d != null) {
+							// using the old style videoSize variable
+							_boxWidth = d.width;
+							_boxHeight = d.height;
+						} else {
+							_boxWidth = 640;
+							_boxHeight = 360;
+						}
+					} else {
+						// Audio
+						_boxWidth = 320;
+						_boxHeight = 180;
+					}
+				}
+				
+				if (_category == Category.video && _boxWidth < 640 && _boxHeight < 360) {
+					// Too small - let's use the minimum size
+					float r = Math.min(640.0 / _boxWidth, 360.0 / _boxHeight);
+					_boxWidth = Math.round(_boxWidth * r);
+					_boxHeight = Math.round(_boxHeight * r);
+				}
+				
+				_moviePath = originalPath.replaceAll("\\.\\./", "");
+				
+				break;
+				
+			default:
+			
+				// Other files types
+				// System.out.println(fileName + " XC=" + externalContent);
+				
+				if (externalContent != void && !util.isEmpty(externalContent)) {
+					try {
+						_external = engine.processTemplate(externalContent);
+					} catch (ElementException e) {
+						util.log("Error processing external content", e);
+						_external = "";
+					}
+				} else {
+					_external = "";
+				}
+					
+				if (externalContentSize != void && !util.isEmpty(externalContentSize)) {
+					Dimension d = util.getDim(externalContentSize);
+					if (d != null) {
+						_boxWidth = d.width;
+						_boxHeight = d.height;
+					}
+				} else if (_external != null && _external.length() > 0) {			
+					_boxWidth = util.getAttrAsInt(_external, "width", maxImageWidth);
+					_boxHeight = util.getAttrAsInt(_external, "height", maxImageHeight);
+				} else {
+					_boxWidth = 400;
+					_boxHeight = 228;
+				}
+				break;
+		
+		}
+			
+		// Shop
+		if (showShop && shopOnSlide) {
+			_shop = util.getShop(currentObject);
+			_discount = shopDiscountRate.toString().replaceAll("%", "").trim();
+			//System.out.println(fileName + " = '" + _shop + "'");
+		}
+				
+		// Adding search item
+		if (searchOn) {
+			util.addSearchItem(
+				fileName + (util.getExt(fileName).equals(_ext)? "" : (":" + _ext)), 
+				new String[] { 
+					skipTitleFromSearch? "" : _title, 
+					_caption, 
+					(skipKeywordsFromSearch || keywords == void || keywords == null)? "" : keywords, 
+					util.isEmpty(_regionNames)? "" : _regionNames,
+					_modifiedDays.toString()
+				}
+			);
+		}
+	}
+}
+
+
+// Updating one item in <fileiterator> loop
+
+void updateLocal() {
+	String s;
+	
+	_title = "";
+	_caption = "";
+	_fileCount = 0;
+	_modifiedDays = 0L;
+	_modifiedAgo = "";
+	_link = "javascript:void(0)";
+	_ext = util.getExt(imagePath);
+
+	if (fileCategory == Category.folder || fileCategory == Category.webPage || util.isWebLocation(fileCategory)) {
+		
+		// Folder or webPage
+		
+		_category = fileCategory;
+		// System.out.println("folder: " + fileTitle + " iconPath: " + iconPath + " thumbPath: " + thumbPath);
+		if (iconPath != void && iconPath != null) {
+			_thumbPath = resPath + "/folder.png";
+		} else if (copyFolderThumbs != void && copyFolderThumbs) {
+			_thumbPath = util.getCopiedFolderThumbPath(thumbPath);
+		} else {
+			_thumbPath = thumbPath;
+		}
+
+		// Title
+		if (fileTitle != void && !util.isEmpty(fileTitle)) {
+			_title = util.cleanup(fileTitle);
+		} else {
+			_title = title.replaceAll("_", " ");
+			// System.out.println(currentFile.toString()); // currentObject.getVars().getMap());
+		}
+		
+		_caption = local.get("description");
+		if (_caption == null) {
+			_caption = "";
+		}
+
+		if (preFormat != void && preFormat) {
+			_caption = util.formatPlainText(util.stripLinebreak(_caption));
+		}
+		
+		if (shortenComments && _caption.length() > 160) {
+			_caption = util.shorten(util.stripHTML(_caption));
+		}
+		
+		if (_category == Category.folder) {
+			int _imageCount;
+			int _videoCount;
+			int _audioCount;
+			String _sep = " &middot; ";
+			StringBuilder sb = new StringBuilder(64);
+			CategoryCounters cnt = JAlbumUtilities.countCategories(currentObject);
+
+			//_fileCount = engine.countFiles(currentFile);
+			_fileCount = cnt.getFileCount();
+			_pageCount = cnt.getCount(Category.webPage);
+			_imageCount = cnt.getCount(Category.image);
+			_videoCount = cnt.getCount(Category.video);
+			_audioCount = cnt.getCount(Category.audio);
+			_otherCount = _fileCount - (_imageCount + _videoCount + _audioCount + _pageCount);
+			totalImageCount += _imageCount;
+			totalVideoCount += _videoCount;
+			totalAudioCount += _audioCount;
+			totalOtherCount += _otherCount;
+			
+			if (showFolderImageCount) {
+				if (_imageCount > 0) {
+					sb.append(_imageCount + "&nbsp;" + util.getText((_imageCount > 1)? "images" : "image"));
+				}
+				if (_videoCount > 0) {
+					sb.append(((sb.length() > 0)? _sep : "") + _videoCount + "&nbsp;" + util.getText((_videoCount > 1)? "videos" : "video"));
+				}
+				if (_audioCount > 0 && !useAlbumAudioAsBackground) {
+					sb.append(((sb.length() > 0)? _sep : "") + _audioCount + "&nbsp;" + util.getText((_audioCount > 1)? "audios" : "audio"));
+				}
+				if (_otherCount > 0) {
+					sb.append(((sb.length() > 0)? _sep : "") + _otherCount + "&nbsp;" + util.getText((_otherCount > 1)? "others" : "other"));
+				}
+				_counters = sb.toString();
+			}
+			
+			// Modified days
+			if (newDaysCount != void && newDaysCount > 0) {
+				switch (newDays) {
+					case -1:
+					case 0:
+						_modifiedDays = (int)(JAlbumUtilities.getDeepLastAdded(currentObject) / 86400000L);
+						break;
+					case 1:
+						_modifiedDays = util.folderDateTakenDays(currentObject, true);
+						break;
+					default:
+						_modifiedDays = util.folderModifiedDays(currentObject);
+				}
+				if (_modifiedDays == null) {
+					_modifiedDays = 0L;
+				}
+			} else {
+				_modifiedDays = 0L;
+			}
+			
+			if (externalContent != void && !util.isEmpty(externalContent)) {
+				_link = externalContent;
+			} else {
+				_link = (_fileCount > 0 || currentFile.length() > 0)? closeupPath : "javascript:void(0)";
+			}
+			folderImgCount += _fileCount - _pageCount;
+			
+		} else if (util.isWebLocation(fileCategory)) {
+			//_modifiedDays = util.folderModifiedDays(currentObject);
+			_link = closeupPath;
+		}
+		
+	} else {
+		
+		// Image
+		
+		_imageNum++;
+		
+		// Changing category for images with external content to "other"
+		_category = (fileCategory != Category.image || externalContent == void || util.isEmpty(externalContent))? fileCategory : Category.other;
+		
+		switch (_category) {
+			case image: 
+				totalImageCount++;
+				break;
+			case video:
+				totalVideoCount++;
+				break;
+			case audio:
+				totalAudioCount++;
+				break;
+			default:
+				totalOtherCount++;
+		}
+		
+		if (processThumbCaption) {	
+			try {
+				_thumbCaption = engine.processTemplate(util.processTemplate(currentObject, thumbCaptionTemplate, _imageNum, shortenComments));
+			} catch (ElementException e) {
+				util.log("Error processing thumbnail template", e);
+			}
+		} else {
+			_thumbCaption = util.processTemplate(currentObject, thumbCaptionTemplate, _imageNum, shortenComments);
+		}
+		
+		if (preFormat != void && preFormat) {
+			_thumbCaption = util.formatPlainText(_thumbCaption);
+		}
+		
+		_thumbExt = util.getExt(thumbPath);
+		
+		updateImage(!util.makeSlides);
+	}
+		
+	if (debugMode != void && debugMode) {
+		util.debug(currentObject);
+	}
+}
+
+// Fallback functions for older albums
+
+String getSitemap() {
+	return util.getSitemap();
+}
+
+String getSitemap(boolean desc) {
+	return util.getSitemap(desc);
+}

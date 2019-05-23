@@ -1,0 +1,10 @@
+<ja:if not exists="backgroundImage">
+<% String bc = util.getCssColor(backgroundColor); %>
+body, .gallery {
+	${bgColor}
+	background: url(bg.png), -webkit-radial-gradient(50% 50%, circle farthest-corner, ${bc}, #000);
+	background: url(bg.png), -moz-radial-gradient(50% 50%, circle farthest-corner, ${bc}, #000);
+	background: url(bg.png), -ms-radial-gradient(50% 50%, circle farthest-corner, ${bc}, #000);
+	background: url(bg.png), radial-gradient(50% 50%, circle farthest-corner, ${bc}, #000);
+}
+</ja:if>

@@ -1,0 +1,18 @@
+#main footer .wrap,
+.actions {
+	color:#aaa;
+	background-color:rgba(0,0,0,0.6);
+}
+#main footer .wrap a,
+.bulkactions span a {
+	color:#ddd;
+}
+#main footer .wrap a:hover,
+.bulkactions span a:hover {
+	color:#fff;
+}
+.no-rgba #main footer .wrap,
+.no-rgba .actions {
+	background-color:transparent;
+	background-image:url(k60.png);
+}

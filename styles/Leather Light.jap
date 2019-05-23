@@ -1,0 +1,10 @@
+skin.backgroundColor=#e9e4dc
+skin.headerColor=#66cc9933
+skin.textColor=#444444
+skin.linkColor=#000066
+skin.hoverColor=#0000cc
+skin.borderColor=#eeeeee
+skin.borderWidth=0
+skin.use3dEffects=true
+skin.descriptionVisible=true
+skin.modalWindowsTheme=auto

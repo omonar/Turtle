@@ -1,0 +1,1 @@
+<%= util.getCatalogue(currentFolder, "", showContentsDescriptions, showContentsThumbs, contentsIncludePages); %>

@@ -1,0 +1,30 @@
+<%-- User interface for editing this page from within jAlbum --%>
+<ja:ui>
+	class SitemapUI extends JWebPageUI {
+		JCheckBox showContentsDescriptions = new JCheckBox("Show descriptions", true);
+		JCheckBox showContentsThumbs = new JCheckBox("Show thumbnails", false);
+		JCheckBox contentsIncludePages = new JCheckBox("Include custom pages", false);
+		{
+			showContentsDescriptions.setOpaque(false);
+			showContentsThumbs.setOpaque(false);
+			add(showContentsDescriptions);
+			add("br", showContentsThumbs);
+			add("br", contentsIncludePages);
+			add("br", new JLabel("The contents is automatically generated from the current folder and the folders below. Works best in the top level folder."));
+			add("br", new JLabel("The comment added below will be displayed above the content."));
+			
+			putClientProperty("helpPage", "https://lazaworx.com/static/help/ui/contents-page.html");
+		}
+	}
+</ja:ui>
+
+<ja:include page="page-header.inc" /> <%-- Keep this --%>
+
+	<div id="contents-page"<ja:if test="${showContentsThumbs}"> class="showthumbs"</ja:if>>
+		<h1>${title}</h1>
+		<ja:if exists="caption"><div class="caption">${caption}</div></ja:if>
+		<ja:else><div>${comment}</div></ja:else>
+		<ja:include page="templates/Contents.inc" />
+	</div>
+
+<ja:include page="page-footer.inc" /> <%-- Keep this --%>

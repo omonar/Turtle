@@ -1,0 +1,19 @@
+/* 
+	Finally.bsh - closing album creation
+*/
+
+	if (searchOn != void && searchOn) {
+		util.stopSearch();
+	}
+	
+	if (copyFolderThumbs != void && copyFolderThumbs) {
+		util.copyAllFolderThumbs();
+	}
+	
+	if (extraSizes != void && !util.isEmpty(extraSizes)) {
+		util.createExtraSizes(extraSizes);
+	}
+	
+	if (zipImages != void && !zipImages.equals("none")) {
+		util.createZip(zipImages);
+	}
